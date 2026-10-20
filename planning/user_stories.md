@@ -4,21 +4,21 @@ Reference the Writing User Stories final project guide in the course portal for 
 
 ## Outline User Roles
 
-1. **Player / Explorer**: An everyday learner, self-improver, or gamer who embarks on real-world skill trees, creates custom learning quests, updates quest statuses in real time, and monitors their ongoing XP progression.
+1. **Aspiring Web Developer / Code Explorer**: An early-career software engineer or student developer navigating modern full-stack web roadmaps, undertaking practical coding challenges, tracking technical milestones across frontend and backend disciplines, and logging their developer XP and stack mastery.
 
 ---
 
 ## Draft User Stories
 
-1. As a **Player / Explorer**, I want to browse a catalog of available Skill Trees (e.g., Full-Stack Web Development, Strength & Conditioning, Digital Illustration), so that I can choose domain tracks that align with my personal development goals.
-2. As a **Player / Explorer**, I want to click into a Skill Tree card to navigate to its dedicated page via a dynamic URL (`/trees/:id`), so that I can review all sequential quests and milestone challenges tied to that specific discipline.
-3. As a **Player / Explorer**, I want to open a modal or slide-out pane to forge a new quest on the current page, so that I can quickly add a goal without interrupting my viewing flow.
-4. As a **Player / Explorer**, I want to define a title, description, difficulty rating, and XP bounty for my quest, so that I have clear objectives and tangible incentives for completion.
-5. As a **Player / Explorer**, I want to inspect a detailed breakdown of any quest's objectives and completion criteria, so that I know exactly what actions are required to master the milestone.
-6. As a **Player / Explorer**, I want to edit an existing quest's title, XP value, or description, so that I can adapt my learning track when my goals or deadlines change.
-7. As a **Player / Explorer**, I want to delete obsolete or accidental quests, so that my quest log remains neat, accurate, and motivating.
-8. As a **Player / Explorer**, I want to toggle a quest's status (e.g., from "Available" or "In Progress" to "Completed") directly in place on the page, so that I get immediate visual satisfaction without needing a full page reload.
-9. As a **Player / Explorer**, I want the join table (`user_quests`) to record my quest status, completion timestamp, and earned XP, so that my personal achievements are accurately tracked in the database.
-10. As a **Player / Explorer**, I want to receive instant toast notifications whenever I create, edit, or complete a quest, so that I get real-time feedback confirming that my action succeeded.
-11. As a **Player / Explorer**, I want buttons and inputs to be disabled while a quest form is submitting, so that I don't accidentally create duplicate entries or cause race conditions.
-12. As a **Player / Explorer**, I want the ability to reset the database to its pristine default seed state, so that I can cleanly showcase the app during demonstrations or restart my progression from scratch.
+1. As an **Aspiring Web Developer**, I want to browse specialized tech roadmap tracks (e.g., Modern Frontend with React, Backend API Architecture, PostgreSQL & Relational Modeling, DevOps & Deployment), so that I can focus on the core competencies needed for full-stack engineering.
+2. As an **Aspiring Web Developer**, I want to click into a Skill Tree track to navigate to its dedicated page via a dynamic URL (`/trees/:id`), so that I can see the sequential technical milestones, coding challenges, and prerequisite concepts for that stack.
+3. As an **Aspiring Web Developer**, I want to open a modal pane to forge a custom coding quest without navigating away from my current roadmap page, so that I can log custom tutorial projects or hackathon tasks into my learning track seamlessly.
+4. As an **Aspiring Web Developer**, I want to define a title, technical description, difficulty tier (Beginner, Intermediate, Advanced), and Dev XP reward for my quest, so that my coding milestones are actionable and realistically weighted.
+5. As an **Aspiring Web Developer**, I want to inspect a detailed quest view with instructions, technical requirements, and documentation links, so that I understand exactly what deliverables (e.g., code snippets, deployed URLs) are required to complete the objective.
+6. As an **Aspiring Web Developer**, I want to edit an existing quest's description, tech stack tags, or XP value, so that I can update project specs as my implementation evolves.
+7. As an **Aspiring Web Developer**, I want to delete obsolete or duplicate coding quests, so that my active development backlog stays clean and focused on high-priority skills.
+8. As an **Aspiring Web Developer**, I want to toggle a quest's status (e.g., from "Backlog" or "In Progress" to "Completed") directly in place on the page, so that I can mark completed coding challenges without waiting for a full page refresh.
+9. As an **Aspiring Web Developer**, I want the join table (`user_quests`) to record my quest status, completion timestamp, Dev XP earned, and personal project notes/repo links, so that my progress history is permanently preserved in the PostgreSQL database.
+10. As an **Aspiring Web Developer**, I want to receive instant toast notifications whenever I create, edit, or complete a quest, so that I get immediate visual confirmation that my developer profile and progress have updated.
+11. As an **Aspiring Web Developer**, I want action buttons and form inputs to be disabled during asynchronous submission, so that I don't submit duplicate coding milestones while waiting for server confirmation.
+12. As an **Aspiring Web Developer**, I want the ability to reset the database to its pristine default seed state, so that I can cleanly showcase the developer roadmap during live code presentations and demo days.

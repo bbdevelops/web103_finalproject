@@ -21,7 +21,7 @@ This unit, be sure to complete all tasks listed below. To complete a task, place
 
 ### 1. What went well during this unit?
 
-Our team successfully brainstormed and aligned on our app concept, **SkillForge**, an RPG-style gamified skill tree and quest tracking platform. We thoroughly analyzed the course rubric and intentionally structured our relational schema to cleanly satisfy both required database relationships: a 1-to-many relationship (`SkillTrees` -> `Quests`) and a many-to-many relationship via a rich join table (`Users` <-> `Quests` with unique fields for `status`, `xp_earned`, and `completed_at`). We also drafted 12 comprehensive user stories from the perspective of our core user role (Player / Explorer) to guide our frontend and backend development.
+Our team successfully brainstormed and aligned on our app concept, **SkillForge**, an RPG-style gamified skill tree and quest tracking platform focused specifically on web developers. We thoroughly analyzed the course rubric and intentionally structured our relational schema to cleanly satisfy both required database relationships: a 1-to-many relationship (`SkillTrees` -> `Quests`) and a many-to-many relationship via a rich join table (`Users` <-> `Quests` with unique fields for `status`, `xp_earned`, and `completed_at`). We also drafted 12 comprehensive user stories from the perspective of our core user role (Aspiring Web Developer / Code Explorer) to guide our frontend and backend development.
 
 ### 2. What were some challenges your group faced in this unit?
 

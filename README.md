@@ -2,7 +2,7 @@
 
 CodePath WEB103 Final Project
 
-Designed and developed by: Manas Singh Bhati, Brian Brown, Erika Villalpando, Dilasha Shakya, Muhais Olatundun
+Designed and developed by: [Your Group Member Names Here]
 
 🔗 Link to deployed app: [Render Deployment Link Coming in Milestone 5]
 
@@ -10,23 +10,24 @@ Designed and developed by: Manas Singh Bhati, Brian Brown, Erika Villalpando, Di
 
 ### Description and Purpose
 
-**SkillForge** is an RPG-inspired real-world skill tree and quest management web application designed to help learners, developers, and creatives turn overwhelming goals into engaging, gamified progression tracks. 
+**SkillForge** is an RPG-inspired skill tree and technical quest management web application designed specifically for **aspiring and junior web developers**. 
 
-Users explore curated **Skill Trees** (such as Web Development, Digital Illustration, Fitness, or Music Production), undertake milestone-based **Quests**, and track their real-time XP gains. By transforming intimidating learning curves into bite-sized, actionable quests, SkillForge bridges the gap between passive learning and measurable daily habit formation.
+Navigating the modern web development landscape (React, Node/Express, PostgreSQL, system architecture, and cloud deployment) can feel overwhelming and fragmented. SkillForge transforms tech roadmaps into gamified **Skill Trees** and bite-sized **Coding Quests**. Developers earn Dev XP, log milestone progress, track project deliverables, and conquer full-stack competencies one milestone at a time—turning the daunting journey of learning to code into an engaging adventure.
 
 ### Inspiration
 
 SkillForge draws inspiration from:
-- **GOATPath** (CodePath Exemplar): The concept of guided career milestones and progress rewards.
-- **Classic RPG Skill Trees (e.g., Skyrim, World of Warcraft, Path of Exile)**: Visualizing personal skill growth through branching nodes and unlockable achievements.
-- **Habitica**: The psychological power of gamification, XP progression, and celebratory feedback for completing real-world tasks.
+- **GOATPath** (CodePath Exemplar): Providing structured career roadmaps and milestones for aspiring tech professionals.
+- **Developer Roadmaps (roadmap.sh)**: Visualizing full-stack engineering specializations and essential prerequisite skills.
+- **Classic RPG Skill Trees (e.g., Skyrim, World of Warcraft)**: Giving tangible visual progression, unlockable tiers, and level-up milestones.
+- **Habitica**: Utilizing gamified accountability and reward loops to encourage consistent daily coding habits.
 
 ## Tech Stack
 
 **Frontend:**
 - React (Vite)
 - React Router (Dynamic client-side routing & page redirection)
-- Modern Vanilla CSS (Dark mode, glassmorphism UI, fluid animations)
+- Modern Vanilla CSS (Sleek dark mode developer aesthetic, glassmorphic cards, fluid status animations)
 
 **Backend:**
 - Node.js & Express.js (RESTful API architecture)
@@ -40,47 +41,45 @@ SkillForge draws inspiration from:
 
 ## Features
 
-### 1. Interactive Skill Tree Explorer
-Explore diverse domains through branching skill categories. Clicking into any skill tree loads dynamic routes (`/trees/:id`) that display all associated quests and completion status.
+### 1. Interactive Web Dev Skill Tree Explorer
+Explore specialized developer tracks (e.g., *Frontend Mastery with React*, *Backend & REST API Architecture*, *Database Modeling with PostgreSQL*, and *DevOps & Cloud Deployment*). Clicking into any tree loads dynamic routes (`/trees/:id`) that display sequential coding milestones, prerequisites, and completion progress.
 - **Relational Model:** 1-to-Many (`SkillTrees` -> `Quests`).
 
 [gif goes here]
 
-### 2. Full Quest Lifecycle Management (RESTful CRUD)
-Players have full control over their learning quests. Users can view quests (`GET`), forge new custom quests (`POST`), modify quest objectives, difficulty, and XP rewards (`PATCH`), or abandon obsolete quests (`DELETE`).
+### 2. Full Quest & Project Lifecycle Management (RESTful CRUD)
+Developers can manage both core roadmap milestones and custom portfolio challenges. Users can view challenges (`GET`), forge new custom coding quests (`POST`), update requirements, difficulty, and Dev XP rewards (`PATCH`), or remove outdated quests (`DELETE`).
 - **Relational Model:** RESTful API with all 4 HTTP methods on `/api/quests`.
 
 [gif goes here]
 
-### 3. Quest Progression & XP Tracker
-Players track their journey by joining quests. Progress, completion timestamps, and earned XP are recorded in a dedicated join table.
+### 3. Developer Progression & XP Tracker
+Developers track their journey as they take on quests. Progress, completion timestamps, earned Dev XP, and repository links/notes are recorded in a dedicated join table.
 - **Relational Model & Custom Feature:** Many-to-Many (`Users` <-> `Quests` via `user_quests` join table featuring unique fields: `status`, `xp_earned`, `completed_at`, and `notes`).
 
 [gif goes here]
 
 ### 4. Quest Forge Modal / Slide-Out Pane
-Allows players to forge new quests or inspect detailed quest objectives within a responsive, accessible modal overlay without navigating away from their active skill tree.
+Allows developers to forge new custom coding quests or view deep-dive project criteria within a responsive, accessible modal overlay without navigating away from their current roadmap view.
 - **Custom Feature:** Slide-out pane / modal dialog.
 
 [gif goes here]
 
-### 5. In-Place Quest Status & Completion Toggle
-Complete quests and claim rewards directly on the page without triggering a full page reload or URL navigation, instantly updating hero XP and status badges.
+### 5. In-Place Coding Milestone Status Toggle
+Toggle quest statuses (e.g., from *In Progress* to *Completed*) directly on the page without triggering a page reload or URL change, instantly updating developer XP totals and badge states.
 - **Baseline Feature:** Interactive in-page state update.
 
 [gif goes here]
 
 ### 6. Database Default State Reset
-A dedicated reset feature that restores the database to its pristine demo state with pre-populated skill trees, default quests, and sample user progress.
+A dedicated reset feature that restores the PostgreSQL database to its clean default state pre-loaded with curated developer skill tracks, standard coding challenges, and starter progress.
 - **Baseline Feature:** Database reset endpoint & seed script (`POST /api/reset`).
 
 [gif goes here]
 
 ### 7. Action Feedback & Toast Notification System (Stretch Feature)
-Delivers immediate feedback via toast notifications on quest creation, updates, and completion, accompanied by loading spinners and dynamic button disabling during async submissions.
+Delivers immediate feedback via toast alerts when quests are created, edited, or completed, accompanied by loading spinners and dynamic button disabling during async submissions.
 - **Stretch Feature:** Polished UX states & toast alerts.
-
-[gif goes here]
 
 ---
 
@@ -92,7 +91,7 @@ Delivers immediate feedback via toast notifications on quest creation, updates, 
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/[your-team-username]/web103_finalproject.git
+git clone https://github.com/bbdevelops/web103_finalproject.git
 cd web103_finalproject
 ```
 
@@ -101,7 +100,7 @@ cd web103_finalproject
 cd server
 npm install
 cp .env.example .env # Add your DATABASE_URL and PORT
-npm run seed        # Seed initial skill trees & quests
+npm run seed        # Seed initial developer skill trees & quests
 npm run dev         # Starts server on http://localhost:3001
 ```
 
