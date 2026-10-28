@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1180" viewBox="0 0 1280 1180" role="img" aria-labelledby="title description">
+<title id='title'>SkillForge: Developer Dashboard</title>
+<desc id='description'>Personal progress across public skill trees. Authentication required.</desc>
+<style>text{font-family:"Segoe UI",Arial,sans-serif}.code{font-family:Consolas,monospace}</style>
+<rect x="0" y="0" width="1280" height="1180" rx="0" fill="#fafafa" stroke="none"/>
+<text x="28" y="31" font-size="12" font-weight="700" fill="#626262" text-anchor="start">SKILLFORGE / MILESTONE 02</text>
+<text x="28" y="67" font-size="29" font-weight="650" fill="#242424" text-anchor="start">03 / Developer Dashboard</text>
+<text x="28" y="92" font-size="15" font-weight="400" fill="#626262" text-anchor="start">Personal progress across public skill trees. Authentication required.</text>
+<text x="1252" y="31" font-size="12" font-weight="600" fill="#626262" text-anchor="end">LOW-FIDELITY / GRAYSCALE</text>
+<rect x="28" y="108" width="1224" height="884" rx="8" fill="#ffffff" stroke="#9b9b9b"/>
+<rect x="29" y="109" width="1222" height="29" rx="7" fill="#e8e8e8" stroke="none"/>
+<circle cx="46" cy="123" r="3.2" fill="#b7b7b7" stroke="#b7b7b7" stroke-width="1.6"/>
+<circle cx="61" cy="123" r="3.2" fill="#b7b7b7" stroke="#b7b7b7" stroke-width="1.6"/>
+<circle cx="76" cy="123" r="3.2" fill="#b7b7b7" stroke="#b7b7b7" stroke-width="1.6"/>
+<text x="102" y="128" font-size="12" font-weight="400" fill="#626262" text-anchor="start" class="code">skillforge.local/dashboard</text>
+<rect x="29" y="138" width="1222" height="68" rx="0" fill="#ffffff" stroke="none"/>
+<line x1="29" y1="206" x2="1251" y2="206" stroke="#b8b8b8" stroke-width="1.4"/>
+<rect x="60" y="154" width="32" height="32" rx="6" fill="#333333" stroke="#333333"/>
+<text x="76" y="176" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">SF</text>
+<text x="104" y="177" font-size="20" font-weight="700" fill="#242424" text-anchor="start">SkillForge</text>
+<text x="302" y="176" font-size="16" font-weight="400" fill="#242424" text-anchor="start">Skill trees</text>
+<text x="426" y="176" font-size="16" font-weight="600" fill="#242424" text-anchor="start">My dashboard</text>
+<line x1="426" y1="191" x2="533" y2="191" stroke="#242424" stroke-width="2"/>
+<text x="1194" y="166" font-size="15" font-weight="600" fill="#242424" text-anchor="end">Alex Chen</text>
+<text x="1194" y="185" font-size="11" font-weight="400" fill="#626262" text-anchor="end">GitHub connected / Sign out</text>
+<circle cx="1221" cy="171" r="14" fill="#e0e0e0" stroke="#b8b8b8" stroke-width="1.6"/>
+<text x="1221" y="176" font-size="10" font-weight="700" fill="#242424" text-anchor="middle">AC</text>
+<text x="60" y="244" font-size="12" font-weight="700" fill="#626262" text-anchor="start">YOUR PROGRESS</text>
+<text x="60" y="279" font-size="32" font-weight="650" fill="#242424" text-anchor="start">Keep building, Alex.</text>
+<text x="60" y="309" font-size="17" font-weight="400" fill="#626262" text-anchor="start">Your work adds up, one completed quest at a time.</text>
+<rect x="60" y="338" width="368" height="106" rx="8" fill="#ffffff" stroke="#b8b8b8"/>
+<text x="82" y="383" font-size="32" font-weight="650" fill="#242424" text-anchor="start">100</text>
+<text x="82" y="415" font-size="12" font-weight="700" fill="#626262" text-anchor="start">TOTAL DEV XP</text>
+<rect x="454" y="338" width="368" height="106" rx="8" fill="#ffffff" stroke="#b8b8b8"/>
+<text x="476" y="383" font-size="32" font-weight="650" fill="#242424" text-anchor="start">1 / 12</text>
+<text x="476" y="415" font-size="12" font-weight="700" fill="#626262" text-anchor="start">QUESTS COMPLETED</text>
+<rect x="848" y="338" width="368" height="106" rx="8" fill="#ffffff" stroke="#b8b8b8"/>
+<text x="870" y="383" font-size="32" font-weight="650" fill="#242424" text-anchor="start">1</text>
+<text x="870" y="415" font-size="12" font-weight="700" fill="#626262" text-anchor="start">QUEST IN PROGRESS</text>
+<rect x="60" y="472" width="744" height="244" rx="8" fill="#ffffff" stroke="#b8b8b8"/>
+<text x="82" y="508" font-size="22" font-weight="650" fill="#242424" text-anchor="start">Skill tree progress</text>
+<text x="82" y="546" font-size="15" font-weight="600" fill="#242424" text-anchor="start">Frontend Mastery with React</text>
+<rect x="459" y="536" width="228" height="8" rx="4" fill="#e9e9e9" stroke="none"/>
+<rect x="459" y="536" width="76.0" height="8" rx="4" fill="#686868" stroke="none"/>
+<text x="773" y="546" font-size="14" font-weight="400" fill="#242424" text-anchor="end">1 / 3  &gt;</text>
+<text x="82" y="589" font-size="15" font-weight="600" fill="#242424" text-anchor="start">Backend &amp; REST API Architecture</text>
+<rect x="459" y="579" width="228" height="8" rx="4" fill="#e9e9e9" stroke="none"/>
+<text x="773" y="589" font-size="14" font-weight="400" fill="#242424" text-anchor="end">0 / 3  &gt;</text>
+<text x="82" y="632" font-size="15" font-weight="600" fill="#242424" text-anchor="start">Database Modeling with PostgreSQL</text>
+<rect x="459" y="622" width="228" height="8" rx="4" fill="#e9e9e9" stroke="none"/>
+<text x="773" y="632" font-size="14" font-weight="400" fill="#242424" text-anchor="end">0 / 3  &gt;</text>
+<text x="82" y="675" font-size="15" font-weight="600" fill="#242424" text-anchor="start">DevOps &amp; Cloud Deployment</text>
+<rect x="459" y="665" width="228" height="8" rx="4" fill="#e9e9e9" stroke="none"/>
+<text x="773" y="675" font-size="14" font-weight="400" fill="#242424" text-anchor="end">0 / 3  &gt;</text>
+<rect x="832" y="472" width="384" height="244" rx="8" fill="#f1f1f1" stroke="#b8b8b8"/>
+<text x="854" y="508" font-size="22" font-weight="650" fill="#242424" text-anchor="start">Continue a quest</text>
+<rect x="854" y="531" width="118" height="27" rx="14" fill="#f1f1f1" stroke="#c5c5c5"/>
+<text x="913.0" y="549" font-size="12" font-weight="600" fill="#242424" text-anchor="middle">IN PROGRESS</text>
+<text x="854" y="588" font-size="21" font-weight="650" fill="#242424" text-anchor="start">Manage React state</text>
+<text x="854" y="619" font-size="15" font-weight="400" fill="#626262" text-anchor="start">150 XP reward / React track</text>
+<rect x="854" y="652" width="338" height="38" rx="5" fill="#333333" stroke="#333333"/>
+<text x="1023.0" y="676.0" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">Open quest  &gt;</text>
+<rect x="60" y="740" width="1156" height="108" rx="8" fill="#ffffff" stroke="#b8b8b8"/>
+<text x="82" y="773" font-size="20" font-weight="650" fill="#242424" text-anchor="start">Recently completed</text>
+<text x="82" y="808" font-size="18" font-weight="600" fill="#242424" text-anchor="start">HTML &amp; CSS foundations</text>
+<text x="529" y="808" font-size="15" font-weight="400" fill="#626262" text-anchor="start">Completed / +100 XP</text>
+<text x="1192" y="808" font-size="15" font-weight="600" fill="#242424" text-anchor="end">View quest   /   Repository  &gt;</text>
+<rect x="60" y="872" width="1156" height="94" rx="8" fill="#f5f5f5" stroke="#8f8f8f" stroke-dasharray="6 4"/>
+<text x="82" y="900" font-size="11" font-weight="700" fill="#626262" text-anchor="start">ADMIN VARIANT / HIDDEN FROM DEVELOPER ACCOUNTS</text>
+<text x="82" y="931" font-size="17" font-weight="600" fill="#242424" text-anchor="start">Restore the default catalog and starter progress.</text>
+<rect x="1000" y="901" width="192" height="38" rx="5" fill="#ffffff" stroke="#b8b8b8"/>
+<text x="1096.0" y="925.0" font-size="15" font-weight="600" fill="#242424" text-anchor="middle">Reset database</text>
+<text x="28" y="1025" font-size="11" font-weight="700" fill="#626262" text-anchor="start">INTERACTION NOTES / OUTSIDE THE APPLICATION FRAME</text>
+<rect x="28" y="1040" width="392" height="112" rx="6" fill="#f3f3f3" stroke="#dedede"/>
+<text x="44" y="1065" font-size="14" font-weight="700" fill="#242424" text-anchor="start">Personal totals</text>
+<text x="44" y="1088" font-size="13" font-weight="400" fill="#626262" text-anchor="start">100 XP, 1 of 12 completed, 1 in progress. Tree</text>
+<text x="44" y="1107" font-size="13" font-weight="400" fill="#626262" text-anchor="start">and quest links return to the relevant</text>
+<text x="44" y="1126" font-size="13" font-weight="400" fill="#626262" text-anchor="start">roadmap.</text>
+<rect x="444" y="1040" width="392" height="112" rx="6" fill="#f3f3f3" stroke="#dedede"/>
+<text x="460" y="1065" font-size="14" font-weight="700" fill="#242424" text-anchor="start">Signed-in access</text>
+<text x="460" y="1088" font-size="13" font-weight="400" fill="#626262" text-anchor="start">Guests sign in through GitHub before viewing</text>
+<text x="460" y="1107" font-size="13" font-weight="400" fill="#626262" text-anchor="start">this page. A new account begins at zero</text>
+<text x="460" y="1126" font-size="13" font-weight="400" fill="#626262" text-anchor="start">progress.</text>
+<rect x="860" y="1040" width="392" height="112" rx="6" fill="#f3f3f3" stroke="#dedede"/>
+<text x="876" y="1065" font-size="14" font-weight="700" fill="#242424" text-anchor="start">Admin reset confirmation</text>
+<text x="876" y="1088" font-size="13" font-weight="400" fill="#626262" text-anchor="start">Dialog: Replace catalog and all progress?</text>
+<text x="876" y="1107" font-size="13" font-weight="400" fill="#626262" text-anchor="start">Cancel / Reset to defaults. Preserve</text>
+<text x="876" y="1126" font-size="13" font-weight="400" fill="#626262" text-anchor="start">identities and roles.</text>
+</svg>

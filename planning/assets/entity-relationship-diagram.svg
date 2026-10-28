@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1280" viewBox="0 0 1280 1280" role="img" aria-labelledby="title description">
+<title id='title'>SkillForge entity relationship diagram</title>
+<desc id='description'>Four PostgreSQL domain entities with crow&#x27;s-foot cardinalities, authorship, and a composite-key progress join table.</desc>
+<style>text{font-family:"Segoe UI",Arial,sans-serif}.code{font-family:Consolas,monospace}</style>
+<rect x="0" y="0" width="1280" height="1280" rx="0" fill="#fafafa" stroke="none"/>
+<text x="36" y="33" font-size="12" font-weight="700" fill="#626262" text-anchor="start">SKILLFORGE / MILESTONE 02</text>
+<text x="36" y="77" font-size="34" font-weight="650" fill="#242424" text-anchor="start">Entity Relationship Diagram</text>
+<text x="36" y="109" font-size="17" font-weight="400" fill="#626262" text-anchor="start">PostgreSQL domain model / Public quests, personal progress, GitHub identities</text>
+<rect x="36" y="156" width="496" height="320" rx="5" fill="#ffffff" stroke="#999999"/>
+<rect x="36" y="156" width="496" height="48" rx="5" fill="#333333" stroke="#333333"/>
+<rect x="36" y="186" width="496" height="18" rx="0" fill="#333333" stroke="none"/>
+<text x="54" y="188" font-size="23" font-weight="650" fill="#ffffff" text-anchor="start" class="code">users</text>
+<rect x="37" y="205" width="494" height="33" rx="0" fill="#eaeaea" stroke="none"/>
+<text x="50" y="227" font-size="11" font-weight="700" fill="#626262" text-anchor="start">KEY</text>
+<text x="116" y="227" font-size="11" font-weight="700" fill="#626262" text-anchor="start">COLUMN</text>
+<text x="360" y="227" font-size="11" font-weight="700" fill="#626262" text-anchor="start">PG TYPE</text>
+<text x="50" y="261" font-size="10" font-weight="700" fill="#626262" text-anchor="start">PK</text>
+<text x="116" y="261" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">id</text>
+<text x="360" y="261" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<rect x="37" y="272" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="50" y="295" font-size="10" font-weight="700" fill="#626262" text-anchor="start">UQ</text>
+<text x="116" y="295" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">github_id</text>
+<text x="360" y="295" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<text x="50" y="329" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="329" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">github_username</text>
+<text x="360" y="329" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<rect x="37" y="340" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="50" y="363" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="363" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">display_name</text>
+<text x="360" y="363" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<text x="50" y="397" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="397" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">avatar_url ?</text>
+<text x="360" y="397" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<rect x="37" y="408" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="50" y="431" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="431" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">role</text>
+<text x="360" y="431" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<text x="50" y="465" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="465" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">created_at</text>
+<text x="360" y="465" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">timestamptz</text>
+<rect x="748" y="156" width="496" height="184" rx="5" fill="#ffffff" stroke="#999999"/>
+<rect x="748" y="156" width="496" height="48" rx="5" fill="#333333" stroke="#333333"/>
+<rect x="748" y="186" width="496" height="18" rx="0" fill="#333333" stroke="none"/>
+<text x="766" y="188" font-size="23" font-weight="650" fill="#ffffff" text-anchor="start" class="code">skill_trees</text>
+<rect x="749" y="205" width="494" height="33" rx="0" fill="#eaeaea" stroke="none"/>
+<text x="762" y="227" font-size="11" font-weight="700" fill="#626262" text-anchor="start">KEY</text>
+<text x="828" y="227" font-size="11" font-weight="700" fill="#626262" text-anchor="start">COLUMN</text>
+<text x="1072" y="227" font-size="11" font-weight="700" fill="#626262" text-anchor="start">PG TYPE</text>
+<text x="762" y="261" font-size="10" font-weight="700" fill="#626262" text-anchor="start">PK</text>
+<text x="828" y="261" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">id</text>
+<text x="1072" y="261" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<rect x="749" y="272" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="762" y="295" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="295" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">title</text>
+<text x="1072" y="295" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<text x="762" y="329" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="329" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">description</text>
+<text x="1072" y="329" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<rect x="748" y="500" width="496" height="490" rx="5" fill="#ffffff" stroke="#999999"/>
+<rect x="748" y="500" width="496" height="48" rx="5" fill="#333333" stroke="#333333"/>
+<rect x="748" y="530" width="496" height="18" rx="0" fill="#333333" stroke="none"/>
+<text x="766" y="532" font-size="23" font-weight="650" fill="#ffffff" text-anchor="start" class="code">quests</text>
+<rect x="749" y="549" width="494" height="33" rx="0" fill="#eaeaea" stroke="none"/>
+<text x="762" y="571" font-size="11" font-weight="700" fill="#626262" text-anchor="start">KEY</text>
+<text x="828" y="571" font-size="11" font-weight="700" fill="#626262" text-anchor="start">COLUMN</text>
+<text x="1072" y="571" font-size="11" font-weight="700" fill="#626262" text-anchor="start">PG TYPE</text>
+<text x="762" y="605" font-size="10" font-weight="700" fill="#626262" text-anchor="start">PK</text>
+<text x="828" y="605" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">id</text>
+<text x="1072" y="605" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<rect x="749" y="616" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="762" y="639" font-size="10" font-weight="700" fill="#626262" text-anchor="start">FK</text>
+<text x="828" y="639" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">skill_tree_id</text>
+<text x="1072" y="639" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<text x="762" y="673" font-size="10" font-weight="700" fill="#626262" text-anchor="start">FK</text>
+<text x="828" y="673" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">created_by_user_id ?</text>
+<text x="1072" y="673" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<rect x="749" y="684" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="762" y="707" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="707" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">title</text>
+<text x="1072" y="707" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<text x="762" y="741" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="741" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">description</text>
+<text x="1072" y="741" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<rect x="749" y="752" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="762" y="775" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="775" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">requirements</text>
+<text x="1072" y="775" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<text x="762" y="809" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="809" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">difficulty</text>
+<text x="1072" y="809" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<rect x="749" y="820" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="762" y="843" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="843" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">xp_reward</text>
+<text x="1072" y="843" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<text x="762" y="877" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="877" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">position</text>
+<text x="1072" y="877" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<rect x="749" y="888" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="762" y="911" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="911" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">prerequisite_notes ?</text>
+<text x="1072" y="911" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<text x="762" y="945" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="945" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">tech_stack_tags</text>
+<text x="1072" y="945" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text[]</text>
+<rect x="749" y="956" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="762" y="979" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="828" y="979" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">documentation_urls</text>
+<text x="1072" y="979" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text[]</text>
+<rect x="36" y="670" width="496" height="320" rx="5" fill="#ffffff" stroke="#999999"/>
+<rect x="36" y="670" width="496" height="48" rx="5" fill="#333333" stroke="#333333"/>
+<rect x="36" y="700" width="496" height="18" rx="0" fill="#333333" stroke="none"/>
+<text x="54" y="702" font-size="23" font-weight="650" fill="#ffffff" text-anchor="start" class="code">user_quests</text>
+<rect x="37" y="719" width="494" height="33" rx="0" fill="#eaeaea" stroke="none"/>
+<text x="50" y="741" font-size="11" font-weight="700" fill="#626262" text-anchor="start">KEY</text>
+<text x="116" y="741" font-size="11" font-weight="700" fill="#626262" text-anchor="start">COLUMN</text>
+<text x="360" y="741" font-size="11" font-weight="700" fill="#626262" text-anchor="start">PG TYPE</text>
+<text x="50" y="775" font-size="10" font-weight="700" fill="#626262" text-anchor="start">PK,FK</text>
+<text x="116" y="775" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">user_id</text>
+<text x="360" y="775" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<rect x="37" y="786" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="50" y="809" font-size="10" font-weight="700" fill="#626262" text-anchor="start">PK,FK</text>
+<text x="116" y="809" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">quest_id</text>
+<text x="360" y="809" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<text x="50" y="843" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="843" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">status</text>
+<text x="360" y="843" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<rect x="37" y="854" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="50" y="877" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="877" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">xp_earned</text>
+<text x="360" y="877" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">integer</text>
+<text x="50" y="911" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="911" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">completed_at ?</text>
+<text x="360" y="911" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">timestamptz</text>
+<rect x="37" y="922" width="494" height="34" rx="0" fill="#f6f6f6" stroke="none"/>
+<text x="50" y="945" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="945" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">notes ?</text>
+<text x="360" y="945" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<text x="50" y="979" font-size="10" font-weight="700" fill="#626262" text-anchor="start"></text>
+<text x="116" y="979" font-size="15" font-weight="500" fill="#242424" text-anchor="start" class="code">repository_url ?</text>
+<text x="360" y="979" font-size="14" font-weight="400" fill="#626262" text-anchor="start" class="code">text</text>
+<line x1="996" y1="340" x2="996" y2="500" stroke="#626262" stroke-width="1.8"/>
+<line x1="1004" y1="350" x2="988" y2="350" stroke="#242424" stroke-width="1.8"/>
+<line x1="1004" y1="357" x2="988" y2="357" stroke="#242424" stroke-width="1.8"/>
+<line x1="987" y1="500" x2="996" y2="481" stroke="#242424" stroke-width="1.8"/>
+<line x1="996" y1="500" x2="996" y2="481" stroke="#242424" stroke-width="1.8"/>
+<line x1="1005" y1="500" x2="996" y2="481" stroke="#242424" stroke-width="1.8"/>
+<circle cx="996" cy="469" r="5" fill="#ffffff" stroke="#626262" stroke-width="1.6"/>
+<text x="1016" y="409" font-size="15" font-weight="600" fill="#242424" text-anchor="start">contains</text>
+<text x="1016" y="432" font-size="12" font-weight="400" fill="#626262" text-anchor="start">1 to 0..*</text>
+<line x1="284" y1="476" x2="284" y2="670" stroke="#626262" stroke-width="1.8"/>
+<line x1="292" y1="486" x2="276" y2="486" stroke="#242424" stroke-width="1.8"/>
+<line x1="292" y1="493" x2="276" y2="493" stroke="#242424" stroke-width="1.8"/>
+<line x1="275" y1="670" x2="284" y2="651" stroke="#242424" stroke-width="1.8"/>
+<line x1="284" y1="670" x2="284" y2="651" stroke="#242424" stroke-width="1.8"/>
+<line x1="293" y1="670" x2="284" y2="651" stroke="#242424" stroke-width="1.8"/>
+<circle cx="284" cy="639" r="5" fill="#ffffff" stroke="#626262" stroke-width="1.6"/>
+<text x="306" y="561" font-size="15" font-weight="600" fill="#242424" text-anchor="start">tracks</text>
+<text x="306" y="585" font-size="12" font-weight="400" fill="#626262" text-anchor="start">1 to 0..*</text>
+<polyline points="532,292 638,292 638,614 748,614" fill="none" stroke="#626262" stroke-width="1.8"/>
+<line x1="542" y1="284" x2="542" y2="300" stroke="#242424" stroke-width="1.8"/>
+<circle cx="557" cy="292" r="5" fill="#ffffff" stroke="#626262" stroke-width="1.6"/>
+<line x1="748" y1="623" x2="729" y2="614" stroke="#242424" stroke-width="1.8"/>
+<line x1="748" y1="614" x2="729" y2="614" stroke="#242424" stroke-width="1.8"/>
+<line x1="748" y1="605" x2="729" y2="614" stroke="#242424" stroke-width="1.8"/>
+<circle cx="717" cy="614" r="5" fill="#ffffff" stroke="#626262" stroke-width="1.6"/>
+<text x="621" y="437" font-size="15" font-weight="600" fill="#242424" text-anchor="end">authors</text>
+<text x="621" y="461" font-size="12" font-weight="400" fill="#626262" text-anchor="end">0..1 creator</text>
+<text x="621" y="481" font-size="12" font-weight="400" fill="#626262" text-anchor="end">0..* quests</text>
+<line x1="532" y1="820" x2="748" y2="820" stroke="#626262" stroke-width="1.8"/>
+<line x1="532" y1="811" x2="551" y2="820" stroke="#242424" stroke-width="1.8"/>
+<line x1="532" y1="820" x2="551" y2="820" stroke="#242424" stroke-width="1.8"/>
+<line x1="532" y1="829" x2="551" y2="820" stroke="#242424" stroke-width="1.8"/>
+<circle cx="563" cy="820" r="5" fill="#ffffff" stroke="#626262" stroke-width="1.6"/>
+<line x1="738" y1="828" x2="738" y2="812" stroke="#242424" stroke-width="1.8"/>
+<line x1="731" y1="828" x2="731" y2="812" stroke="#242424" stroke-width="1.8"/>
+<text x="640" y="770" font-size="15" font-weight="600" fill="#242424" text-anchor="middle">records</text>
+<text x="640" y="794" font-size="12" font-weight="400" fill="#626262" text-anchor="middle">0..* to 1</text>
+<rect x="36" y="1022" width="1208" height="214" rx="8" fill="#f1f1f1" stroke="#d1d1d1"/>
+<text x="58" y="1055" font-size="12" font-weight="700" fill="#626262" text-anchor="start">READING THE MODEL</text>
+<line x1="58" y1="1092" x2="122" y2="1092" stroke="#626262" stroke-width="1.8"/>
+<line x1="68" y1="1084" x2="68" y2="1100" stroke="#242424" stroke-width="1.8"/>
+<line x1="75" y1="1084" x2="75" y2="1100" stroke="#242424" stroke-width="1.8"/>
+<text x="142" y="1098" font-size="16" font-weight="600" fill="#242424" text-anchor="start">Exactly one</text>
+<line x1="386" y1="1092" x2="450" y2="1092" stroke="#626262" stroke-width="1.8"/>
+<line x1="396" y1="1084" x2="396" y2="1100" stroke="#242424" stroke-width="1.8"/>
+<circle cx="411" cy="1092" r="5" fill="#ffffff" stroke="#626262" stroke-width="1.6"/>
+<text x="470" y="1098" font-size="16" font-weight="600" fill="#242424" text-anchor="start">Zero or one</text>
+<line x1="714" y1="1092" x2="778" y2="1092" stroke="#626262" stroke-width="1.8"/>
+<line x1="714" y1="1083" x2="733" y2="1092" stroke="#242424" stroke-width="1.8"/>
+<line x1="714" y1="1092" x2="733" y2="1092" stroke="#242424" stroke-width="1.8"/>
+<line x1="714" y1="1101" x2="733" y2="1092" stroke="#242424" stroke-width="1.8"/>
+<circle cx="745" cy="1092" r="5" fill="#ffffff" stroke="#626262" stroke-width="1.6"/>
+<text x="798" y="1098" font-size="16" font-weight="600" fill="#242424" text-anchor="start">Zero or many</text>
+<text x="58" y="1138" font-size="15" font-weight="400" fill="#242424" text-anchor="start">PK = primary key / FK = foreign key / UQ = unique / ? = nullable; all other fields required.</text>
+<text x="58" y="1172" font-size="15" font-weight="600" fill="#242424" text-anchor="start">user_quests: composite PK (user_id, quest_id); progress and XP belong to the developer.</text>
+<text x="58" y="1204" font-size="14" font-weight="400" fill="#626262" text-anchor="start">Null creator = seeded quest. Prerequisite notes guide learning; no dependency table or enforced unlocks.</text>
+</svg>
