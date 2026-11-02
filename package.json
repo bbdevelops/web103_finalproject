@@ -1,0 +1,25 @@
+{
+  "name": "skillforge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev:client": "npm run dev --workspace=client",
+    "dev:server": "npm run dev --workspace=server",
+    "seed": "npm run seed --workspace=server",
+    "test": "npm run test --workspace=server",
+    "test:browser": "node scripts/verify-browser.mjs",
+    "lint": "npm run lint --workspace=client",
+    "build": "npm run build --workspace=client"
+  },
+  "devDependencies": {
+    "playwright": "1.64.1"
+  }
+}

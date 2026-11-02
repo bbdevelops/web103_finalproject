@@ -31,7 +31,7 @@ SkillForge draws inspiration from:
 
 **Backend:**
 - Node.js & Express.js (RESTful API architecture)
-- PostgreSQL (Relational database hosted on Render / Supabase / Neon)
+- PostgreSQL (Relational database hosted on Render)
 - `pg` (node-postgres connection pool)
 
 **Deployment:**
@@ -41,11 +41,15 @@ SkillForge draws inspiration from:
 
 ## Features
 
-### 1. Interactive Web Dev Skill Tree Explorer
+Completed features are marked ✅. The remaining features are planned for later milestones.
+
+### ✅ 1. Interactive Web Dev Skill Tree Explorer
 Explore specialized developer tracks (e.g., *Frontend Mastery with React*, *Backend & REST API Architecture*, *Database Modeling with PostgreSQL*, and *DevOps & Cloud Deployment*). Clicking into any tree loads dynamic routes (`/trees/:id`) that display sequential coding milestones, prerequisites, and completion progress.
 - **Relational Model:** 1-to-Many (`SkillTrees` -> `Quests`).
 
-[gif goes here]
+![SkillForge walkthrough: browse four skill trees, open the React roadmap, inspect quest status and prerequisites, refresh, and explore another track.](docs/gifs/m3-skill-tree-explorer.gif)
+
+Completed in Milestone 3: the Explorer, dynamic tree detail pages, persisted demo progress summaries, responsive layouts, and loading/error/empty states. The development preview uses seeded developer **Alex Chen**; GitHub sign-in and progress editing are planned separately.
 
 ### 2. Full Quest & Project Lifecycle Management (RESTful CRUD)
 Developers can manage both core roadmap milestones and custom portfolio challenges. Users can view challenges (`GET`), forge new custom coding quests (`POST`), update requirements, difficulty, and Dev XP rewards (`PATCH`), or remove outdated quests (`DELETE`).
@@ -86,8 +90,10 @@ Delivers immediate feedback via toast alerts when quests are created, edited, or
 ## Installation Instructions
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- PostgreSQL (local instance or cloud database connection URL)
+- Node.js **24.x** and npm (the version is also recorded in `.nvmrc`)
+- A dedicated PostgreSQL database; this milestone uses Render PostgreSQL with TLS
+
+Commands below run from the repository root. In Windows PowerShell, use `npm.cmd` in place of `npm` if script execution policy blocks `npm.ps1`.
 
 ### 1. Clone the repository
 ```bash
@@ -95,18 +101,60 @@ git clone https://github.com/bbdevelops/web103_finalproject.git
 cd web103_finalproject
 ```
 
-### 2. Backend Setup
+### 2. Install and configure
 ```bash
-cd server
 npm install
-cp .env.example .env # Add your DATABASE_URL and PORT
-npm run seed        # Seed initial developer skill trees & quests
-npm run dev         # Starts server on http://localhost:3001
+cp .env.example .env
 ```
 
-### 3. Frontend Setup
+For a fresh clone, fill in the root `.env` with your database settings. Keep an existing configured `.env` when updating the repository. PowerShell also supports `Copy-Item .env.example .env` for the copy step.
+
+Use Render's **external** hostname, database, user, and password in `PGHOST`, `PGDATABASE`, `PGUSER`, and `PGPASSWORD`; set `PGPORT=5432` and `PGSSLMODE=require`. Alternatively, set `DATABASE_URL`, which takes precedence over the individual connection fields. The backend loads this root file even when started from `server/`. Keep credentials out of source control.
+
+### 3. Seed the database
 ```bash
-cd ../client
-npm install
-npm run dev         # Starts React app on http://localhost:5173
+npm run seed
 ```
+
+The seed command transactionally rebuilds the project's four domain tables, so use a dedicated development database. It creates four tracks, twelve quests, a demo developer and admin, and starter progress. Alex starts with **100 XP**, **1/12 quests completed**, **1 in progress**, and **1/3 completed in React**. Repeated runs restore these defaults. The reusable catalog seed preserves identities/roles for the future reset feature; the CLI schema rebuild is intended for development setup.
+
+### 4. Start the application
+
+Run these in separate terminals from the repository root:
+
+```bash
+npm run dev:server  # http://localhost:3001
+```
+
+```bash
+npm run dev:client  # http://localhost:5173
+```
+
+The client proxies `/api` to Express. The navbar links to the Explorer and the future dashboard; quest create/view controls are clearly marked as coming soon. Demo identity is enabled in development and disabled in production.
+
+### Verification
+
+```bash
+npm test           # 14 PostgreSQL/API integration tests in a disposable test schema
+npm run lint
+npm run build
+npm run test:browser
+```
+
+Browser checks need the two development servers running and Chrome available. Windows uses the standard installed Chrome path; set `CHROME_PATH` for another executable, or install Playwright Chromium with `npx playwright install chromium`. Browser checks cover navigation, seeded data, refresh, mobile layouts, keyboard focus, retry, loading, empty states, and missing routes. They also capture unmocked demo frames under ignored `.artifacts/m3/`.
+
+To rebuild the README GIF after recording, use Python with Pillow installed:
+
+```bash
+python scripts/build-demo-gif.py
+```
+
+### Implemented API
+
+| Method | Endpoint | Response |
+| --- | --- | --- |
+| GET | `/api/health` | Database health; 200 `{ "ok": true }` or 503 `{ "ok": false }` |
+| GET | `/api/trees` | Trees, quest/completion counts, demo user, and XP/progress summary |
+| GET | `/api/trees/:id` | One tree and quests ordered by position then ID, with personal status |
+
+See the [Milestone 3 progress report](milestones/progress_report_3.md), [completion plan](milestones/milestone3_plan.md), and [project board](https://github.com/users/bbdevelops/projects/2) for the sprint evidence.
