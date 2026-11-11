@@ -8,9 +8,8 @@ dotenv.config({
 
 export const DEMO_GITHUB_ID = "skillforge:alex";
 export const ADMIN_GITHUB_ID = "skillforge:admin";
-export const demoAuthEnabled =
-  process.env.NODE_ENV !== "production" &&
-  process.env.DEMO_AUTH_ENABLED !== "false";
+// Demo identities are available only through explicit test injection.
+export const demoAuthEnabled = false;
 
 export function databaseOptions(overrides = {}) {
   const connectionString = process.env.DATABASE_URL?.trim();

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import { useApiResource } from "../hooks/useApiResource.js";
 import { Icon } from "../components/Icon.jsx";
 import { TreeCard } from "../components/TreeCard.jsx";
@@ -9,13 +10,14 @@ import {
 } from "../components/Feedback.jsx";
 
 export function ExplorerPage() {
+  const { user } = useOutletContext();
   const { data, loading, error, retry } = useApiResource("/api/trees");
   useEffect(() => {
     document.title = "Skill trees · SkillForge";
   }, []);
   if (loading) return <LoadingState />;
-  if (error) return <ErrorState error={error} retry={retry} />;
-  const { trees, summary, user } = data;
+  if (error && !data) return <ErrorState error={error} retry={retry} />;
+  const { trees, summary } = data;
   return (
     <>
       <section className="explorer-hero">
@@ -55,7 +57,7 @@ export function ExplorerPage() {
       <section
         className="stats-panel"
         aria-label={
-          user ? `${user.display_name}'s demo progress` : "Roadmap progress"
+          user ? `${user.display_name}'s progress` : "Roadmap progress"
         }
       >
         <div className="stats-intro">
