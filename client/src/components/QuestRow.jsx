@@ -1,4 +1,7 @@
 import { Icon } from "./Icon.jsx";
+import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
+import { api } from "../lib/api.js";
 
 const statuses = {
   completed: "Completed",
@@ -6,7 +9,27 @@ const statuses = {
   backlog: "Backlog",
 };
 
-export function QuestRow({ quest, index }) {
+export function QuestRow({ quest, index, onView }) {
+  const { user, signIn, invalidate } = useOutletContext();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  const [retryStatus, setRetryStatus] = useState(null);
+  async function saveStatus(status) {
+    setPending(true);
+    setError("");
+    setRetryStatus(status);
+    try {
+      await api(`/api/quests/${quest.id}/progress`, {
+        method: "PUT",
+        body: JSON.stringify({ status }),
+      });
+      invalidate();
+    } catch (failure) {
+      setError(failure.message);
+    } finally {
+      setPending(false);
+    }
+  }
   return (
     <li className={`quest-row status-${quest.status}`}>
       <span className="quest-step" aria-hidden="true">
@@ -41,13 +64,47 @@ export function QuestRow({ quest, index }) {
         <div className="quest-actions">
           <button
             className="text-button"
-            disabled
-            title="Quest details are coming soon"
+            onClick={(event) => onView(quest.id, event.currentTarget)}
           >
             View quest <Icon name="arrow" size={14} />
           </button>
-          <span>More quest tools coming soon</span>
+          {user ? (
+            <label className="status-control">
+              My status
+              <select
+                aria-label={`My status for ${quest.title}`}
+                value={quest.status}
+                disabled={pending}
+                onChange={(event) => saveStatus(event.target.value)}
+              >
+                {Object.entries(statuses)
+                  .reverse()
+                  .map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+              </select>
+              {pending && <span role="status">Saving…</span>}
+            </label>
+          ) : (
+            <button className="text-button" onClick={signIn}>
+              Sign in to track
+            </button>
+          )}
         </div>
+        {error && (
+          <p role="alert" className="inline-error">
+            {error}{" "}
+            <button
+              className="text-button"
+              disabled={pending}
+              onClick={() => saveStatus(retryStatus)}
+            >
+              Retry status save
+            </button>
+          </p>
+        )}
       </div>
     </li>
   );

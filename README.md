@@ -49,13 +49,15 @@ Explore specialized developer tracks (e.g., *Frontend Mastery with React*, *Back
 
 ![SkillForge walkthrough: browse four skill trees, open the React roadmap, inspect quest status and prerequisites, refresh, and explore another track.](docs/gifs/m3-skill-tree-explorer.gif)
 
-Completed in Milestone 3: the Explorer, dynamic tree detail pages, persisted demo progress summaries, responsive layouts, and loading/error/empty states. The development preview uses seeded developer **Alex Chen**; GitHub sign-in and progress editing are planned separately.
+Completed in Milestone 3: the Explorer, dynamic tree detail pages, persisted demo progress summaries, responsive layouts, and loading/error/empty states. That walkthrough uses seeded developer **Alex Chen**. Milestone 4 adds GitHub sign-in, quest editing, and personal progress updates.
 
-### 2. Full Quest & Project Lifecycle Management (RESTful CRUD)
+### ✅ 2. Full Quest & Project Lifecycle Management (RESTful CRUD)
 Developers can manage both core roadmap milestones and custom portfolio challenges. Users can view challenges (`GET`), forge new custom coding quests (`POST`), update requirements, difficulty, and Dev XP rewards (`PATCH`), or remove outdated quests (`DELETE`).
 - **Relational Model:** RESTful API with all 4 HTTP methods on `/api/quests`.
 
-[gif goes here]
+![Create a quest, inspect it, edit its content, and confirm deletion in the running app.](docs/gifs/m4-quest-crud.gif)
+
+Completed in Milestone 4: database-backed creation, full details, partial updates and tree moves, creator/admin permissions, field validation, and cascading deletion of personal progress.
 
 ### 3. Developer Progression & XP Tracker
 Developers track their journey as they take on quests. Progress, completion timestamps, earned Dev XP, and repository links/notes are recorded in a dedicated join table.
@@ -63,17 +65,17 @@ Developers track their journey as they take on quests. Progress, completion time
 
 [gif goes here]
 
-### 4. Quest Forge Modal / Slide-Out Pane
+### ✅ 4. Quest Forge Modal / Slide-Out Pane
 Allows developers to forge new custom coding quests or view deep-dive project criteria within a responsive, accessible modal overlay without navigating away from their current roadmap view.
 - **Custom Feature:** Slide-out pane / modal dialog.
 
-[gif goes here]
+![Use the accessible Forge form, read full quest details, save personal notes, and edit a quest without leaving the roadmap.](docs/gifs/m4-quest-panes.gif)
 
-### 5. In-Place Coding Milestone Status Toggle
+### ✅ 5. In-Place Coding Milestone Status Toggle
 Toggle quest statuses (e.g., from *In Progress* to *Completed*) directly on the page without triggering a page reload or URL change, instantly updating developer XP totals and badge states.
 - **Baseline Feature:** Interactive in-page state update.
 
-[gif goes here]
+![Change a quest from Backlog to In Progress and Completed, verify earned XP after refresh, and reopen it to clear the award.](docs/gifs/m4-status-xp.gif)
 
 ### 6. Database Default State Reset
 A dedicated reset feature that restores the PostgreSQL database to its clean default state pre-loaded with curated developer skill tracks, standard coding challenges, and starter progress.
@@ -123,30 +125,54 @@ The seed command transactionally rebuilds the project's four domain tables, so u
 Run these in separate terminals from the repository root:
 
 ```bash
-npm run dev:server  # http://localhost:3001
+npm run dev:server  # http://127.0.0.1:3001
 ```
 
 ```bash
-npm run dev:client  # http://localhost:5173
+npm run dev:client  # http://127.0.0.1:5173
 ```
 
-The client proxies `/api` to Express. The navbar links to the Explorer and the future dashboard; quest create/view controls are clearly marked as coming soon. Demo identity is enabled in development and disabled in production.
+The client proxies `/api` and `/auth` to Express. Open **http://127.0.0.1:5173** consistently so OAuth redirects and session cookies use the same host. The dashboard remains an M5 placeholder.
+
+### GitHub sign-in setup
+
+Register a development OAuth App in GitHub Settings → Developer settings → OAuth Apps. Set its homepage to `http://127.0.0.1:5173` and redirect URI to `http://127.0.0.1:5173/auth/callback`, with wildcard matching and Device Flow disabled. Copy the Client ID and generate a client secret, then configure the root `.env` privately:
+
+```dotenv
+CLIENT_ORIGIN=http://127.0.0.1:5173
+GITHUB_CLIENT_ID=your_client_id
+GITHUB_CLIENT_SECRET=your_client_secret
+GITHUB_CALLBACK_URL=http://127.0.0.1:5173/auth/callback
+SESSION_SECRET=a_private_random_secret
+```
+
+Generate the session secret locally with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Restart the API after changing configuration. PostgreSQL session storage is initialized automatically without rebuilding domain tables. Missing OAuth configuration leaves public browsing available and shows a retryable sign-in message.
+
+Guests can browse shared content; mutations require a session. New GitHub accounts start with zero progress and do not inherit Alex's seeded progress. GitHub tokens are used during sign-in and discarded. Full development reseeding invalidates sessions; the reusable catalog seed preserves users and roles. Demo identities are explicit automated-test fixtures, never the default application account.
+
+For M5 deployment, configure HTTPS, `NODE_ENV=production`, a production callback and client origin, proxy trust, Secure/SameSite=None cookies, and credentialed CORS. The server includes the environment-dependent session settings; deployment remains M5 work.
 
 ### Verification
 
 ```bash
-npm test           # 14 PostgreSQL/API integration tests in a disposable test schema
+npm test           # 24 PostgreSQL/API integration tests in disposable test schemas
 npm run lint
 npm run build
 npm run test:browser
+npm run test:oauth # Opens Chrome for interactive verification with a real GitHub account
 ```
 
-Browser checks need the two development servers running and Chrome available. Windows uses the standard installed Chrome path; set `CHROME_PATH` for another executable, or install Playwright Chromium with `npx playwright install chromium`. Browser checks cover navigation, seeded data, refresh, mobile layouts, keyboard focus, retry, loading, empty states, and missing routes. They also capture unmocked demo frames under ignored `.artifacts/m3/`.
+The M4 browser suite starts its own API and Vite server on port 5174, uses a disposable PostgreSQL schema, and simulates only the external OAuth provider. It checks real application mutations, sessions, permissions in the UI, keyboard focus, mobile layouts, pending/error/retry behavior, loading, empty states, and missing routes. Development data is preserved. Chrome must be available; set `CHROME_PATH` for another executable, or install Playwright Chromium with `npx playwright install chromium`.
+
+The separate real OAuth check requires the development servers running on ports 3001 and 5173. Complete login in its Chrome window; it verifies return navigation, refresh persistence, logout, and reauthentication. Session cookies and check artifacts remain under ignored `.artifacts/m4/` and must stay out of source control.
 
 To rebuild the README GIF after recording, use Python with Pillow installed:
 
 ```bash
 python scripts/build-demo-gif.py
+# M4: after the real OAuth check, record actual app interactions and encode three GIFs
+node scripts/record-m4.mjs
+python scripts/build-demo-gif.py --milestone m4
 ```
 
 ### Implemented API
@@ -156,5 +182,21 @@ python scripts/build-demo-gif.py
 | GET | `/api/health` | Database health; 200 `{ "ok": true }` or 503 `{ "ok": false }` |
 | GET | `/api/trees` | Trees, quest/completion counts, demo user, and XP/progress summary |
 | GET | `/api/trees/:id` | One tree and quests ordered by position then ID, with personal status |
+| GET | `/api/quests/:id` | Full shared quest and current user's personal progress, or null |
+| POST | `/api/quests` | Create a quest owned by the session user; 201 `{ quest }` |
+| PATCH | `/api/quests/:id` | Creator/admin partial update; `{ quest }` |
+| DELETE | `/api/quests/:id` | Creator/admin deletion with progress cascade; 204 |
+| PUT | `/api/quests/:id/progress` | Save session user's status/notes/repository URL; `{ progress }` |
+| GET | `/api/me/progress` | Authenticated `{ summary, trees }` derived from personal progress |
+| GET | `/auth/github` | Start GitHub sign-in; accepts a local `returnTo` path |
+| GET | `/auth/callback` | Verify OAuth state and establish a PostgreSQL-backed session |
+| GET | `/auth/me` | Current `{ user }`, or 401 |
+| POST | `/auth/logout` | Destroy session and clear cookie; 204 |
+
+Quest writes accept `skill_tree_id`, `title`, `description`, `requirements`, `difficulty`, `xp_reward`, `position`, `prerequisite_notes`, `tech_stack_tags`, and `documentation_urls`. Required text cannot be blank; difficulty is `beginner`, `intermediate`, or `advanced`; XP and position are nonnegative integers; supplied links use HTTP(S). Validation returns 400 `{ error, errors }` with errors keyed by field. Writes return 401 when unsigned, 403 when unauthorized, and 404 for missing quests. Only admins manage seeded quests.
+
+Progress accepts `status` (`backlog`, `in_progress`, `completed`), `notes`, and `repository_url`. Omitted fields preserve existing values; blank/null optional text clears it. Completion snapshots reward/time once, reopening clears that award/time, and later reward edits do not change saved awards. Ownership, roles, timestamps, and earned XP are server-controlled.
+
+See the [Milestone 4 progress report](milestones/progress_report_4.md) for the completed sprint, verification, GIFs, and rubric evidence. The progress API is complete; the dashboard portion of Feature 3 remains in M5.
 
 See the [Milestone 3 progress report](milestones/progress_report_3.md), [completion plan](milestones/milestone3_plan.md), and [project board](https://github.com/users/bbdevelops/projects/2) for the sprint evidence.

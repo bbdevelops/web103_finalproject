@@ -1,39 +1,49 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import { api } from "../lib/api.js";
 
-export function useApiResource(url) {
-  const { setUser } = useOutletContext();
+export function useApiResource(url, { enabled = true } = {}) {
+  const { revision, authLoading, user } = useOutletContext();
+  const resourceKey = `${user?.id ?? "guest"}:${url}`;
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState({
-    loading: true,
+    url: null,
     data: null,
     error: null,
+    loading: true,
   });
 
   useEffect(() => {
+    if (!enabled || authLoading) return;
     const controller = new AbortController();
-    setState({ loading: true, data: null, error: null });
-    async function load() {
-      try {
-        const response = await fetch(url, { signal: controller.signal });
-        const payload = await response.json();
-        if (!response.ok)
-          throw Object.assign(
-            new Error(payload.error ?? "Your roadmap could not be loaded."),
-            { status: response.status },
-          );
-        if (!controller.signal.aborted) {
-          setUser(payload.user ?? null);
-          setState({ loading: false, data: payload, error: null });
-        }
-      } catch (error) {
+    setState((previous) => ({
+      url: resourceKey,
+      data: previous.url === resourceKey ? previous.data : null,
+      error: null,
+      loading: true,
+    }));
+    api(url, { signal: controller.signal })
+      .then((data) => {
         if (!controller.signal.aborted)
-          setState({ loading: false, data: null, error });
-      }
-    }
-    load();
+          setState({ url: resourceKey, data, error: null, loading: false });
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted)
+          setState((previous) => ({ ...previous, error, loading: false }));
+      });
     return () => controller.abort();
-  }, [url, attempt, setUser]);
+  }, [url, resourceKey, attempt, revision, enabled, authLoading]);
 
-  return { ...state, retry: () => setAttempt((value) => value + 1) };
+  const retry = useCallback(() => setAttempt((value) => value + 1), []);
+  const data = enabled && state.url === resourceKey ? state.data : null;
+  return {
+    data,
+    error: enabled && state.url === resourceKey ? state.error : null,
+    loading:
+      enabled &&
+      !data &&
+      (authLoading || state.url !== resourceKey || state.loading),
+    refreshing: state.loading,
+    retry,
+  };
 }

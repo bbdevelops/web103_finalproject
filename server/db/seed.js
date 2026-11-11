@@ -5,6 +5,11 @@ import { createPool } from "./pool.js";
 import { catalog } from "./catalog.js";
 
 export async function rebuildSchema(client) {
+  // Full development rebuilds invalidate sessions before internal user IDs can be reused.
+  const {
+    rows: [sessions],
+  } = await client.query("SELECT to_regclass('user_sessions') AS name");
+  if (sessions.name) await client.query("DELETE FROM user_sessions");
   // The caller owns the transaction and search_path (public for development, isolated for tests).
   await client.query(
     "DROP TABLE IF EXISTS user_quests, quests, skill_trees, users",
