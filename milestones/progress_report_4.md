@@ -1,9 +1,9 @@
 # Milestone 4 Progress Report
 
 ## Milestone 4 Completion
-Completion percentage for Milestone 4 - Unit 8: 0%
+Completion percentage for Milestone 4 - Unit 8: 100%
 
-All six issue implementations and acceptance checks are complete on the M4 branch. GitHub reconciliation and submission are in progress; the percentage above reflects issue state before those final updates.
+All six original M4 issues (#7–#12) are implemented and verified, their acceptance checklists are complete, and each is Closed with a Done project-board status: **6 closed / 6 total = 100%**. Issue counts and board statuses were checked directly on GitHub on November 11, 2026.
 
 - [#7: Quest REST API (GET/POST/PATCH/DELETE /api/quests)](https://github.com/bbdevelops/web103_finalproject/issues/7) - `server/routes/quests.js`, `server/validation.js`, `server/app.js`
 - [#8: Quest Forge pane: create and edit form](https://github.com/bbdevelops/web103_finalproject/issues/8) - `client/src/components/QuestForm.jsx`, `client/src/components/QuestDialog.jsx`, `client/src/styles.css`
@@ -51,7 +51,7 @@ The automated browser suite replaces only the external OAuth provider and uses r
 | [Milestone 1 - Unit 5](https://github.com/bbdevelops/web103_finalproject/milestone/1) | 100% (1/1) |
 | [Milestone 2 - Unit 6](https://github.com/bbdevelops/web103_finalproject/milestone/2) | 100% (1/1) |
 | [Milestone 3 - Unit 7](https://github.com/bbdevelops/web103_finalproject/milestone/3) | 100% (4/4) |
-| [Milestone 4 - Unit 8](https://github.com/bbdevelops/web103_finalproject/milestone/4) | 0% (0/6), final reconciliation in progress |
+| [Milestone 4 - Unit 8](https://github.com/bbdevelops/web103_finalproject/milestone/4) | 100% (6/6) |
 | [Milestone 5 - Unit 9](https://github.com/bbdevelops/web103_finalproject/milestone/5) | 0% (0/4) |
 
 Project board: [SkillForge](https://github.com/users/bbdevelops/projects/2). M4 retains all six original issues; M5 retains dashboard, database reset, reusable toasts, and deployment. Basic inline feedback/pending states are included in M4. README Feature 3 remains incomplete until the M5 dashboard is delivered.
@@ -60,9 +60,9 @@ Project board: [SkillForge](https://github.com/users/bbdevelops/projects/2). M4 
 
 | Criterion from the final rubric in m4.md | Points | Evidence |
 | --- | ---: | --- |
-| M4 is 100% complete on GitHub | 8 | Final issue/board reconciliation in progress; six verified implementations listed above |
+| M4 is 100% complete on GitHub | 8 | Six original issues closed, acceptance checklists complete, and board statuses Done; 6/6 = 100% |
 | All five reflection answers | 5 | [Milestone 4 reflections](milestone4.md#reflection) |
 | At least two completed features in this report | 2 | Three completed features listed above and checked in README |
 | At least two corresponding feature GIFs | 6 | Three GIFs embedded here and beneath README Features 2, 4, and 5 |
 
-The full submission gate is 21 points; GitHub completion will be recorded only after the issue states and board are synchronized.
+**All four rubric criteria are documented, covering the 21-point submission gate.** The report, milestone checklist/reflections, README markers, and feature GIFs agree with the verified GitHub state.

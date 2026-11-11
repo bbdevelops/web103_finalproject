@@ -6,12 +6,12 @@ This document should be completed and submitted during **Unit 8** of this course
 
 This unit, be sure to complete all tasks listed below. To complete a task, place an `x` between the brackets.
 
-- [ ] Update the completion percentage of each GitHub Milestone. The milestone for this unit (Milestone 4 - Unit 8) should be 100% completed when you submit for full points.
+- [x] Update the completion percentage of each GitHub Milestone. The milestone for this unit (Milestone 4 - Unit 8) should be 100% completed when you submit for full points.
 - [x] In `README.md`, check off the features you have completed in this unit by adding a ✅ emoji in front of the feature's name.
   - [x] Under each feature you have completed, include a GIF showing feature functionality.
 - [x] In this document, complete all five questions in the **Reflection** section below.
 
-Features 2, 4, and 5 are complete and have real-app GIFs. GitHub milestone/board reconciliation is the remaining submission step; see [the progress report](progress_report_4.md).
+Features 2, 4, and 5 are complete and have real-app GIFs. All six M4 issues are Closed/Done, giving 6/6 = 100%. M1–M3 remain 100%; M5 remains 0%. See [the progress report](progress_report_4.md) for verification and grading evidence.
 
 ## Reflection
 
@@ -25,7 +25,7 @@ The main implementation challenges were keeping shared quest ownership separate 
 
 ### 3. Did you finish all of your tasks in your sprint plan for this week? If you did not finish all of the planned tasks, how would you prioritize the remaining tasks on your list?
 
-The implementation and verification for all six planned M4 issues (#7–#12) are complete. The final submission step is to synchronize the issue checklists, Closed/Done states, milestone percentages, and grading branch with this evidence. No unfinished feature was moved out of M4 to raise its percentage. M5 remains focused on the dashboard, admin reset, reusable toast notifications, and deployment; deployment and its end-to-end production checks should take priority over additional polish.
+Yes. All six planned M4 issues (#7–#12) are implemented, verified, closed, and marked Done on the project board. Their acceptance checklists are complete, and M4 is 100% complete. No unfinished feature was moved out of M4 to raise its percentage. M5 remains focused on the dashboard, admin reset, reusable toast notifications, and deployment; deployment and its end-to-end production checks should take priority over additional polish.
 
 ### 4. Which features and user stories would you consider “at risk”? How will you change your plan if those items remain “at risk”?
 
