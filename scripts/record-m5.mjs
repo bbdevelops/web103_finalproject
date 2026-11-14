@@ -37,6 +37,7 @@ const context = await chromium.launchPersistentContext(
     executablePath:
       process.env.CHROME_PATH ?? (existsSync(chrome) ? chrome : undefined),
     headless: false,
+    chromiumSandbox: true,
     viewport: { width: 1280, height: 900 },
     reducedMotion: "reduce",
   },
@@ -100,6 +101,16 @@ try {
     .getByRole("heading", { name: "Your developer dashboard", exact: true })
     .waitFor({ timeout: 600000 });
   await frame(["dashboard"], "protected-dashboard", 2400);
+  // Make real loading/pending states readable in the recording without mocking responses.
+  const network = await context.newCDPSession(page);
+  await network.send("Network.enable");
+  await network.send("Network.emulateNetworkConditions", {
+    offline: false,
+    latency: 1000,
+    downloadThroughput: 125000,
+    uploadThroughput: 62500,
+    connectionType: "cellular3g",
+  });
   await page
     .getByRole("link", { name: "Explore skill trees", exact: true })
     .click();
@@ -125,7 +136,13 @@ try {
   await page
     .getByLabel("Documentation URLs (one per line)")
     .fill("javascript:invalid-link");
+  const invalidReply = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      response.url().endsWith("/api/quests"),
+  );
   await button("Create quest").click();
+  assert.equal((await invalidReply).status(), 400);
   await page
     .locator(".field-error")
     .filter({ hasText: "HTTP or HTTPS" })
@@ -140,6 +157,12 @@ try {
       response.url().endsWith("/api/quests"),
   );
   await button("Create quest").click();
+  await button("Saving…").waitFor();
+  assert.equal(
+    await page.getByLabel("Title *", { exact: true }).isDisabled(),
+    true,
+  );
+  await frame([], "submission-pending");
   const questId = (await (await createReply).json()).quest.id;
   created.add(questId);
   await row(title).waitFor();
@@ -162,9 +185,13 @@ try {
   await button("Save changes").click();
   await row(edited).waitFor();
   await row(edited).getByRole("combobox").selectOption("completed");
+  await row(edited).getByText("Saving…", { exact: true }).waitFor();
+  await frame([], "status-save-pending");
   await row(edited).locator(".status-badge.completed").waitFor();
   await frame([], "quest-completed");
   await page.getByRole("link", { name: "Dashboard", exact: true }).click();
+  await page.locator(".loading-state").waitFor();
+  await frame(["dashboard"], "dashboard-loading");
   await page.getByRole("link", { name: edited, exact: true }).waitFor();
   await frame(["dashboard"], "earned-xp-and-history", 2400);
   await page.reload();
@@ -267,6 +294,8 @@ try {
   console.log(
     "OWNER CHECKPOINT: backup is verified. Read the warning in Chrome, then click Reset to defaults when ready. The recorder will not click it for you.",
   );
+  await button("Resetting…").waitFor({ timeout: 600000 });
+  await frame(["reset"], "reset-in-progress");
   await page
     .getByText(
       "Database restored to defaults. Accounts and roles were preserved.",
@@ -302,6 +331,8 @@ try {
         origin,
         realGitHubSession: true,
         apiMocked: false,
+        controlledNetworkLatency: true,
+        invalidInputRejected: true,
         ownerConfirmedReset: true,
         backupSha256: backup.sha256,
         defaultCatalogVerified: true,

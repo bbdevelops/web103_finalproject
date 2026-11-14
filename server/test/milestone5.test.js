@@ -213,6 +213,34 @@ test("admin provisioning promotes only the selected existing numeric GitHub iden
   );
 });
 
+test("configured origins with trailing slashes accept same-origin writes and reject foreign origins", async () => {
+  const normalizedApp = createApp({
+    pool,
+    auth: { ...auth, clientOrigin: "http://127.0.0.1:5173/" },
+  });
+  try {
+    const response = await request(normalizedApp).get("/auth/me").expect(401);
+    assert.equal(
+      response.headers["access-control-allow-origin"],
+      "http://127.0.0.1:5173",
+    );
+    await request(normalizedApp)
+      .post("/auth/logout")
+      .set("Origin", "http://127.0.0.1:5173")
+      .expect(204);
+    await request(normalizedApp)
+      .post("/auth/logout")
+      .set("Origin", "http://127.0.0.1:5173.evil.example")
+      .expect(403);
+    await request(normalizedApp)
+      .post("/auth/logout")
+      .set("Origin", "http://127.0.0.1:9999")
+      .expect(403);
+  } finally {
+    await normalizedApp.locals.sessionStore.close();
+  }
+});
+
 test("shared-origin production cookies are Secure, HttpOnly and SameSite=Lax", async () => {
   const previous = process.env.NODE_ENV;
   let productionApp;
