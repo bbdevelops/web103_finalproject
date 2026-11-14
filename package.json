@@ -11,11 +11,16 @@
     "node": ">=24 <25"
   },
   "scripts": {
+    "start": "npm run start --workspace=server",
+    "admin:grant": "node scripts/grant-admin.mjs",
+    "db:backup": "node scripts/backup-database.mjs",
     "dev:client": "npm run dev --workspace=client",
     "dev:server": "npm run dev --workspace=server",
     "seed": "npm run seed --workspace=server",
     "test": "npm run test --workspace=server",
-    "test:browser": "node scripts/verify-browser-m4.mjs",
+    "test:browser": "node scripts/verify-browser-m5.mjs",
+    "test:production": "node scripts/verify-production.mjs",
+    "test:deployed": "node scripts/verify-deployed.mjs",
     "test:oauth": "node scripts/verify-oauth.mjs",
     "lint": "npm run lint --workspace=client",
     "build": "npm run build --workspace=client"

@@ -14,7 +14,7 @@ import { fixtureStrategy } from "../server/testing/auth-fixture.js";
 // The app, Passport, session store, API, and PostgreSQL queries are the real implementation.
 const schema = `skillforge_browser_${randomUUID().replaceAll("-", "")}`;
 const adminPool = createPool({ max: 1 });
-const output = resolve(".artifacts/m4/browser");
+const output = resolve(".artifacts/m5/browser");
 const checks = [],
   errors = [];
 let pool, app, apiServer, vite, browser, page;
@@ -70,10 +70,14 @@ try {
     reducedMotion: "reduce",
   });
   page = await context.newPage();
+  let provider = "alex",
+    cancelSignIn = false,
+    authorizationCount = 0;
   page.on("pageerror", (error) => errors.push(error.message));
   // Intercept the initial request: Playwright does not route later URLs in a redirect chain.
   // Preserve the server's session cookie and state, replacing only the external provider hop.
   await context.route(/\/auth\/github(?:\?|$)/, async (route) => {
+    authorizationCount++;
     const response = await route.fetch({ maxRedirects: 0 });
     const url = new URL(response.headers().location);
     assert.equal(url.origin, "https://github.com");
@@ -82,7 +86,7 @@ try {
       status: 302,
       headers: {
         ...response.headers(),
-        location: `${origin}/auth/callback?code=alex&state=${url.searchParams.get("state")}`,
+        location: `${origin}/auth/callback?${cancelSignIn ? "error=access_denied" : `code=${provider}`}&state=${url.searchParams.get("state")}`,
       },
     });
   });
@@ -103,6 +107,10 @@ try {
   await expectText(page.locator(".stat-value").first(), /0\s*XP/);
   await page.getByRole("link", { name: /Frontend Mastery with React/ }).click();
   await heading("Frontend Mastery with React").waitFor();
+  assert.equal(
+    await page.getByLabel("My status", { exact: true }).isDisabled(),
+    true,
+  );
   await row("Manage React state")
     .getByRole("button", { name: "View quest" })
     .click();
@@ -127,6 +135,42 @@ try {
   await page.getByRole("button", { name: "Sign out", exact: true }).waitFor();
   pass(
     "GitHub provider fixture returns to the original tree and PostgreSQL session survives refresh",
+  );
+
+  await page.getByLabel("Difficulty", { exact: true }).selectOption("beginner");
+  await expectText(page.locator(".filter-summary"), "Showing 1 of 3 quests");
+  assert.equal(await page.locator(".quest-row").count(), 1);
+  await expectText(page.locator(".detail-progress strong"), /1\s*\/\s*3/);
+  await page
+    .getByLabel("My status", { exact: true })
+    .selectOption("in_progress");
+  await heading("No quests match these filters.").waitFor();
+  await page
+    .getByRole("button", { name: "Show all quests", exact: true })
+    .click();
+  await expectText(page.locator(".filter-summary"), "Showing 3 of 3 quests");
+  assert.equal(await page.locator(".quest-row").count(), 3);
+  await page.getByLabel("Sort quests", { exact: true }).selectOption("xp");
+  await page
+    .locator(".quest-content h3")
+    .first()
+    .filter({ hasText: "Build React routing" })
+    .waitFor();
+  assert.equal(
+    await page.locator(".quest-content h3").first().innerText(),
+    "Build React routing",
+  );
+  await page.getByLabel("Sort quests", { exact: true }).selectOption("title");
+  assert.deepEqual(await page.locator(".quest-content h3").allTextContents(), [
+    "Build React routing",
+    "HTML & CSS foundations",
+    "Manage React state",
+  ]);
+  await page
+    .getByRole("button", { name: "Clear filters", exact: true })
+    .click();
+  pass(
+    "combined filters, clear results, and deterministic sorting preserve full-tree totals",
   );
 
   const forge = page.getByRole("button", { name: "Forge Quest", exact: true });
@@ -419,9 +463,205 @@ try {
   await page.goto(`${origin}/missing-page`);
   await heading("Let’s find your path.").waitFor();
   await page.goto(`${origin}/dashboard`);
-  await heading("A home for your progress.").waitFor();
+  await heading("Your developer dashboard").waitFor();
+  await page
+    .getByRole("link", { name: "HTML & CSS foundations", exact: true })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("heading", { name: "HTML & CSS foundations", exact: true })
+    .waitFor();
+  assert.equal(new URL(page.url()).searchParams.get("quest"), "1");
+  await page.getByRole("button", { name: "Close pane" }).click();
+  assert.equal(new URL(page.url()).searchParams.has("quest"), false);
+  await page.goto(`${origin}/trees/2?quest=1`);
+  await page
+    .getByRole("alert")
+    .filter({ hasText: "no longer in this skill tree" })
+    .waitFor();
+  await page.getByRole("button", { name: "Dismiss", exact: true }).click();
   pass(
-    "missing routes recover and the M5 dashboard remains an explicit placeholder",
+    "dashboard completion links open details and invalid deep links offer recovery",
+  );
+
+  await page.goto(`${origin}/dashboard`);
+  await page
+    .getByLabel("Dashboard earned XP")
+    .filter({ hasText: "100" })
+    .waitFor();
+  assert.equal(
+    await page
+      .getByRole("button", { name: "Reset database", exact: true })
+      .count(),
+    0,
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: resolve(output, "dashboard-mobile.png"),
+    fullPage: true,
+  });
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+    true,
+  );
+  const dashboardColumns = await page
+    .locator(".dashboard-columns")
+    .evaluate(
+      (element) =>
+        getComputedStyle(element).gridTemplateColumns.split(" ").length,
+    );
+  assert.equal(dashboardColumns, 1);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  pass(
+    "dashboard shows private progress, hides admin tools from developers, and stacks on mobile",
+  );
+
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Sign in with GitHub", exact: true })
+    .waitFor();
+  assert.equal(new URL(page.url()).pathname, "/");
+  provider = "newcomer";
+  await page.goto(`${origin}/dashboard`);
+  await heading("Your developer dashboard").waitFor();
+  await page
+    .getByLabel("Dashboard earned XP")
+    .filter({ hasText: "0" })
+    .waitFor();
+  await heading("Your first win belongs here.").waitFor();
+  pass(
+    "protected dashboard redirects to sign-in and new accounts have empty progress",
+  );
+
+  await page.route("**/api/me/progress", (route) =>
+    route.fulfill({
+      json: {
+        summary: {
+          total_xp: 0,
+          total_quests: 0,
+          completed_quests: 0,
+          in_progress_quests: 0,
+        },
+        trees: [
+          {
+            id: 888,
+            title: "Empty skill tree",
+            quest_count: 0,
+            completed_count: 0,
+          },
+        ],
+        recent_completions: [],
+      },
+    }),
+  );
+  await page.reload();
+  await page.getByText("No quests yet", { exact: true }).waitFor();
+  assert.ok(!(await page.locator("body").innerText()).includes("NaN"));
+  await page.unroute("**/api/me/progress");
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Sign in with GitHub", exact: true })
+    .waitFor();
+  const authorizationsBeforeCancel = authorizationCount;
+  cancelSignIn = true;
+  await page.goto(`${origin}/dashboard`);
+  await page
+    .locator(".feedback-panel")
+    .getByRole("button", { name: "Sign in with GitHub", exact: true })
+    .waitFor();
+  assert.equal(new URL(page.url()).searchParams.get("authError"), "failed");
+  assert.equal(authorizationCount, authorizationsBeforeCancel + 1);
+  pass(
+    "empty dashboard trees are safe and cancelled authentication offers retry without a redirect loop",
+  );
+
+  cancelSignIn = false;
+  provider = "admin";
+  await page
+    .locator(".feedback-panel")
+    .getByRole("button", { name: "Sign in with GitHub", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Reset database", exact: true })
+    .waitFor();
+  const temporaryResponse = await context.request.post(`${origin}/api/quests`, {
+    data: {
+      skill_tree_id: 1,
+      title: "Reset browser fixture",
+      description: "Temporary shared quest",
+      requirements: "Remove with reset",
+      difficulty: "beginner",
+      xp_reward: 60,
+      position: 4,
+    },
+  });
+  assert.equal(temporaryResponse.status(), 201);
+  const temporaryId = (await temporaryResponse.json()).quest.id;
+  await page
+    .getByRole("button", { name: "Reset database", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  assert.equal(
+    (await context.request.get(`${origin}/api/quests/${temporaryId}`)).status(),
+    200,
+  );
+  await page
+    .getByRole("button", { name: "Reset database", exact: true })
+    .click();
+  await page.route("**/api/reset", (route) =>
+    route.fulfill({ status: 503, json: { error: "Temporary reset failure" } }),
+  );
+  await page
+    .getByRole("button", { name: "Reset to defaults", exact: true })
+    .click();
+  await page
+    .getByRole("alert")
+    .filter({ hasText: "Temporary reset failure" })
+    .waitFor();
+  await page.unroute("**/api/reset");
+  let releaseReset;
+  const resetGate = new Promise((resolveGate) => {
+    releaseReset = resolveGate;
+  });
+  await page.route("**/api/reset", async (route) => {
+    await resetGate;
+    await route.continue();
+  });
+  await page
+    .getByRole("button", { name: "Reset to defaults", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Resetting…", exact: true }).waitFor();
+  assert.equal(
+    await page.getByRole("button", { name: "Close pane" }).isDisabled(),
+    true,
+  );
+  assert.equal(
+    await page
+      .getByRole("button", { name: "Cancel", exact: true })
+      .isDisabled(),
+    true,
+  );
+  releaseReset();
+  await page.getByRole("dialog").waitFor({ state: "hidden" });
+  await page
+    .getByText(
+      "Database restored to defaults. Accounts and roles were preserved.",
+      { exact: true },
+    )
+    .waitFor();
+  await page.unroute("**/api/reset");
+  assert.equal(
+    (await context.request.get(`${origin}/api/quests/${temporaryId}`)).status(),
+    404,
+  );
+  assert.equal(
+    (await (await context.request.get(`${origin}/auth/me`)).json()).user.role,
+    "admin",
+  );
+  pass(
+    "admin reset supports cancellation, failure recovery, disabled pending controls, and preserved sessions",
   );
 
   await page.goto(origin);
@@ -453,7 +693,7 @@ try {
       2,
     ),
   );
-  console.log(`${checks.length} M4 browser checks passed.`);
+  console.log(`${checks.length} M5 browser checks passed.`);
 } catch (error) {
   if (page) {
     await page

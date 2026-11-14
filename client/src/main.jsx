@@ -4,7 +4,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout.jsx";
 import { ExplorerPage } from "./pages/ExplorerPage.jsx";
 import { TreeDetailPage } from "./pages/TreeDetailPage.jsx";
-import { DashboardPage, NotFoundPage } from "./pages/PlaceholderPages.jsx";
+import { NotFoundPage } from "./pages/PlaceholderPages.jsx";
+import { DashboardPage } from "./pages/DashboardPage.jsx";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
