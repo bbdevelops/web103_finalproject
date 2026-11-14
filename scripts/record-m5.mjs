@@ -294,7 +294,8 @@ try {
   console.log(
     "OWNER CHECKPOINT: backup is verified. Read the warning in Chrome, then click Reset to defaults when ready. The recorder will not click it for you.",
   );
-  await button("Resetting…").waitFor({ timeout: 600000 });
+  await page.bringToFront();
+  await button("Resetting…").waitFor({ timeout: 0 });
   await frame(["reset"], "reset-in-progress");
   await page
     .getByText(
@@ -313,6 +314,10 @@ try {
     (await (await context.request.get(`${origin}/auth/me`)).json()).user.role,
     "admin",
   );
+  await page
+    .getByLabel("Dashboard earned XP")
+    .filter({ hasText: /^0\s*XP$/ })
+    .waitFor();
   await frame(["reset"], "defaults-restored", 2400);
   await button("Sign out").click();
   await button("Sign in with GitHub").waitFor();

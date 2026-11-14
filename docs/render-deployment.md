@@ -98,7 +98,9 @@ npm.cmd run record:m5
 python scripts/build-demo-gif.py --milestone m5
 ```
 
-The read-only deployment check saves the canonical origin for the OAuth and recording commands. The OAuth check opens Chrome for real sign-in. The recorder requires matching live verification, an authenticated admin, and a fresh verified backup; it stops at the reset confirmation for the owner to click. If a run is interrupted before reset, it removes only the temporary quests created by that recording. It never confirms the global reset automatically.
+The read-only deployment check saves the canonical origin for the OAuth and recording commands. The OAuth check opens sandbox-enabled Chrome for real sign-in. The recorder requires matching live verification, an authenticated admin, and a fresh verified backup; it brings the reset confirmation to the front and waits for the owner without a timeout. If a run is interrupted before reset, it removes only the temporary quests created by that recording. It never confirms the global reset automatically.
+
+To resume only an interrupted final reset step after the earlier real walkthrough frames exist, run `npm.cmd run record:m5:reset`. This reuses the earlier genuine captures, refreshes the reset demonstration state, and waits for the owner's confirmation. It does not repeat the earlier CRUD workflow or automatically confirm reset.
 
 Free web services sleep after idle periods; allow the service to finish waking before the demo. The existing database's reported remaining lifetime covers the November 15 target and November 17 final submission window. Record the actual expiration in Render for any later demo.
 
