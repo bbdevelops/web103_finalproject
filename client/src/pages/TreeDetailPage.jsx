@@ -1,5 +1,10 @@
-import { useEffect, useState } from "react";
-import { Link, useOutletContext, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import {
+  Link,
+  useOutletContext,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useApiResource } from "../hooks/useApiResource.js";
 import { Icon } from "../components/Icon.jsx";
 import { treeTheme } from "../lib/treeTheme.js";
@@ -7,6 +12,7 @@ import { ProgressBar } from "../components/ProgressBar.jsx";
 import { QuestRow } from "../components/QuestRow.jsx";
 import { QuestForm } from "../components/QuestForm.jsx";
 import { QuestDetails } from "../components/QuestDetails.jsx";
+import { QuestFilters } from "../components/QuestFilters.jsx";
 import {
   EmptyState,
   ErrorState,
@@ -15,20 +21,56 @@ import {
 
 export function TreeDetailPage() {
   const { id } = useParams();
-  const { user, signIn, invalidate } = useOutletContext();
+  const { user, signIn, invalidate, resetRevision } = useOutletContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const linkedQuestId = searchParams.get("quest");
+  const backLink = useRef(null);
+  const defaults = { difficulty: "all", status: "all", sort: "roadmap" };
+  const [filters, setFilters] = useState(defaults);
+  const [linkError, setLinkError] = useState("");
   const [pane, setPane] = useState(null);
   const [message, setMessage] = useState("");
   const progress = useApiResource("/api/me/progress", {
     enabled: Boolean(user),
   });
   function saved(text) {
-    setPane(null);
+    closePane();
     setMessage(text);
     invalidate();
+  }
+  function closePane() {
+    setPane(null);
+    if (linkedQuestId !== null) {
+      const next = new URLSearchParams(searchParams);
+      next.delete("quest");
+      setSearchParams(next, { replace: true });
+    }
   }
   const { data, loading, error, retry } = useApiResource(
     `/api/trees/${encodeURIComponent(id)}`,
   );
+  useEffect(() => {
+    setFilters({ difficulty: "all", status: "all", sort: "roadmap" });
+    setPane(null);
+    setLinkError("");
+  }, [id, resetRevision, user?.id]);
+  useEffect(() => {
+    if (!data || linkedQuestId === null) return;
+    const quest = data.quests.find((item) => String(item.id) === linkedQuestId);
+    if (quest) {
+      setLinkError("");
+      setPane({
+        mode: "details",
+        questId: quest.id,
+        trigger: backLink.current,
+      });
+    } else {
+      setPane(null);
+      setLinkError(
+        "That quest is no longer in this skill tree. You can continue with the roadmap below.",
+      );
+    }
+  }, [data, linkedQuestId]);
   useEffect(() => {
     document.title = data
       ? `${data.tree.title} · SkillForge`
@@ -37,12 +79,40 @@ export function TreeDetailPage() {
   if (loading) return <LoadingState />;
   if (error && !data) return <ErrorState error={error} retry={retry} />;
   const { tree, quests } = data;
+  const visibleQuests = quests
+    .filter(
+      (quest) =>
+        (filters.difficulty === "all" ||
+          quest.difficulty === filters.difficulty) &&
+        (!user || filters.status === "all" || quest.status === filters.status),
+    )
+    .sort((a, b) => {
+      if (filters.sort === "xp")
+        return b.xp_reward - a.xp_reward || a.id - b.id;
+      if (filters.sort === "title")
+        return a.title.localeCompare(b.title) || a.id - b.id;
+      return a.position - b.position || a.id - b.id;
+    });
   const theme = treeTheme(tree.id);
   return (
     <div className={`detail-page theme-${theme.color}`}>
-      <Link to="/" className="back-link">
+      <Link to="/" className="back-link" ref={backLink}>
         <Icon name="back" size={16} /> All skill trees
       </Link>
+      {linkError && (
+        <p className="inline-error" role="alert">
+          {linkError}{" "}
+          <button
+            className="text-button"
+            onClick={() => {
+              closePane();
+              setLinkError("");
+            }}
+          >
+            Dismiss
+          </button>
+        </p>
+      )}
       {message && (
         <p className="inline-success" role="status">
           {message}
@@ -111,19 +181,41 @@ export function TreeDetailPage() {
               <span aria-hidden="true">+</span> Forge Quest
             </button>
           </div>
+          <QuestFilters
+            value={filters}
+            onChange={setFilters}
+            canTrack={Boolean(user)}
+            count={visibleQuests.length}
+            total={quests.length}
+            onClear={() => setFilters(defaults)}
+          />
           {quests.length ? (
-            <ol className="quest-list">
-              {quests.map((quest, index) => (
-                <QuestRow
-                  key={quest.id}
-                  quest={quest}
-                  index={index}
-                  onView={(questId, trigger) =>
-                    setPane({ mode: "details", questId, trigger })
-                  }
-                />
-              ))}
-            </ol>
+            visibleQuests.length ? (
+              <ol className="quest-list">
+                {visibleQuests.map((quest) => (
+                  <QuestRow
+                    key={quest.id}
+                    quest={quest}
+                    index={quests.findIndex((item) => item.id === quest.id)}
+                    onView={(questId, trigger) =>
+                      setPane({ mode: "details", questId, trigger })
+                    }
+                  />
+                ))}
+              </ol>
+            ) : (
+              <div className="filtered-empty">
+                <EmptyState title="No quests match these filters.">
+                  Try a different difficulty or status.
+                </EmptyState>
+                <button
+                  className="button secondary"
+                  onClick={() => setFilters(defaults)}
+                >
+                  Show all quests
+                </button>
+              </div>
+            )
           ) : (
             <EmptyState title="A fresh canvas.">
               This track has no quests yet. Explore another tree while this
@@ -167,7 +259,7 @@ export function TreeDetailPage() {
             key={pane.questId}
             questId={pane.questId}
             restoreFocusTo={pane.trigger}
-            onClose={() => setPane(null)}
+            onClose={closePane}
             onEdit={(quest) =>
               setPane({ mode: "edit", quest, trigger: pane.trigger })
             }
@@ -178,7 +270,7 @@ export function TreeDetailPage() {
             quest={pane.quest}
             treeId={tree.id}
             restoreFocusTo={pane.trigger}
-            onClose={() => setPane(null)}
+            onClose={closePane}
             onSaved={saved}
           />
         ))}

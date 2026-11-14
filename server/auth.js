@@ -76,7 +76,7 @@ export function configureAuth(app, pool, options = {}) {
         saveUninitialized: false,
         cookie: {
           httpOnly: true,
-          sameSite: production ? "none" : "lax",
+          sameSite: "lax",
           secure: production,
           maxAge: 7 * 24 * 60 * 60 * 1000,
         },
@@ -148,7 +148,7 @@ export function configureAuth(app, pool, options = {}) {
       res.clearCookie(SESSION_COOKIE, {
         path: "/",
         httpOnly: true,
-        sameSite: production ? "none" : "lax",
+        sameSite: "lax",
         secure: production,
       });
       res.sendStatus(204);

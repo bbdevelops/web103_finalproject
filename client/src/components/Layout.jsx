@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { Icon } from "./Icon.jsx";
 import { api } from "../lib/api.js";
 
@@ -7,13 +13,18 @@ export function Layout() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [revision, setRevision] = useState(0);
+  const [resetRevision, setResetRevision] = useState(0);
   const [accountError, setAccountError] = useState("");
   const [loggingOut, setLoggingOut] = useState(false);
   const { pathname, search, hash } = useLocation();
-  const invalidate = useCallback(() => setRevision((value) => value + 1), []);
-  const signIn = () => {
+  const navigate = useNavigate();
+  const invalidate = useCallback(({ reset = false } = {}) => {
+    setRevision((value) => value + 1);
+    if (reset) setResetRevision((value) => value + 1);
+  }, []);
+  const signIn = useCallback(() => {
     window.location.href = `/auth/github?returnTo=${encodeURIComponent(pathname + search.replace(/([?&])authError=[^&]*&?/, "$1").replace(/[?&]$/, "") + hash)}`;
-  };
+  }, [pathname, search, hash]);
   useEffect(() => {
     const controller = new AbortController();
     api("/auth/me", { signal: controller.signal })
@@ -33,6 +44,7 @@ export function Layout() {
       await api("/auth/logout", { method: "POST" });
       setUser(null);
       invalidate();
+      if (pathname === "/dashboard") navigate("/");
     } catch (error) {
       setAccountError(error.message);
     } finally {
@@ -102,7 +114,17 @@ export function Layout() {
             </button>
           </div>
         )}
-        <Outlet context={{ user, authLoading, revision, invalidate, signIn }} />
+        <Outlet
+          context={{
+            user,
+            authLoading,
+            authError: accountError,
+            revision,
+            resetRevision,
+            invalidate,
+            signIn,
+          }}
+        />
       </main>
       <footer className="site-footer">
         <span>Small quests. Real progress.</span>

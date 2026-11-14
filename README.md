@@ -35,7 +35,7 @@ SkillForge draws inspiration from:
 - `pg` (node-postgres connection pool)
 
 **Deployment:**
-- Render (Frontend Static Site & Backend Web Service)
+- Render (one Node Web Service serving the built React frontend, Express API, and GitHub authentication)
 
 ---
 
@@ -89,6 +89,13 @@ Delivers immediate feedback via toast alerts when quests are created, edited, or
 
 ---
 
+M5 repository implementation is ready for deployment. Follow the [Render setup runbook](docs/render-deployment.md) to configure the existing database and private OAuth settings. Production verification and the final GIFs follow that owner setup checkpoint; toast work remains teammate-owned.
+
+### 8. Quest Filtering & Sorting (Custom Feature)
+Filter a roadmap by difficulty and personal status, or sort by roadmap order, highest XP, and title. Combined filters show matching counts without changing the full track completion or XP totals. Public visitors can filter difficulty and sort; personal-status filtering requires sign-in.
+
+Implemented in M5; deployed walkthrough evidence is pending the Render setup checkpoint.
+
 ## Installation Instructions
 
 ### Prerequisites
@@ -132,7 +139,7 @@ npm run dev:server  # http://127.0.0.1:3001
 npm run dev:client  # http://127.0.0.1:5173
 ```
 
-The client proxies `/api` and `/auth` to Express. Open **http://127.0.0.1:5173** consistently so OAuth redirects and session cookies use the same host. The dashboard remains an M5 placeholder.
+The client proxies `/api` and `/auth` to Express. Open **http://127.0.0.1:5173** consistently so OAuth redirects and session cookies use the same host. The protected dashboard shows personal totals, per-tree progress, recent completions, and admin-only reset tools.
 
 ### GitHub sign-in setup
 
@@ -150,19 +157,19 @@ Generate the session secret locally with `node -e "console.log(require('crypto')
 
 Guests can browse shared content; mutations require a session. New GitHub accounts start with zero progress and do not inherit Alex's seeded progress. GitHub tokens are used during sign-in and discarded. Full development reseeding invalidates sessions; the reusable catalog seed preserves users and roles. Demo identities are explicit automated-test fixtures, never the default application account.
 
-For M5 deployment, configure HTTPS, `NODE_ENV=production`, a production callback and client origin, proxy trust, Secure/SameSite=None cookies, and credentialed CORS. The server includes the environment-dependent session settings; deployment remains M5 work.
+For M5 deployment, configure HTTPS, `NODE_ENV=production`, a production callback and client origin, proxy trust, Secure/SameSite=Lax cookies, and credentialed CORS. The server includes the environment-dependent session settings. See the single-service runbook for exact production values.
 
 ### Verification
 
 ```bash
-npm test           # 24 PostgreSQL/API integration tests in disposable test schemas
+npm test           # 31 PostgreSQL/API integration tests in disposable test schemas
 npm run lint
 npm run build
 npm run test:browser
 npm run test:oauth # Opens Chrome for interactive verification with a real GitHub account
 ```
 
-The M4 browser suite starts its own API and Vite server on port 5174, uses a disposable PostgreSQL schema, and simulates only the external OAuth provider. It checks real application mutations, sessions, permissions in the UI, keyboard focus, mobile layouts, pending/error/retry behavior, loading, empty states, and missing routes. Development data is preserved. Chrome must be available; set `CHROME_PATH` for another executable, or install Playwright Chromium with `npx playwright install chromium`.
+The M5 browser suite starts its own API and Vite server on port 5174, uses a disposable PostgreSQL schema, and simulates only the external OAuth provider. It checks real application mutations, sessions, permissions in the UI, keyboard focus, mobile layouts, pending/error/retry behavior, loading, empty states, and missing routes. Development data is preserved. Chrome must be available; set `CHROME_PATH` for another executable, or install Playwright Chromium with `npx playwright install chromium`.
 
 The separate real OAuth check requires the development servers running on ports 3001 and 5173. Complete login in its Chrome window; it verifies return navigation, refresh persistence, logout, and reauthentication. Session cookies and check artifacts remain under ignored `.artifacts/m4/` and must stay out of source control.
 
@@ -174,6 +181,16 @@ python scripts/build-demo-gif.py
 node scripts/record-m4.mjs
 python scripts/build-demo-gif.py --milestone m4
 ```
+
+### M5 deployment checks
+
+```bash
+npm run test:production
+npm run test:deployed -- https://your-service.onrender.com
+npm run test:oauth
+```
+
+The deployed smoke check saves the public origin under ignored `.artifacts/m5/`; the OAuth check then uses that origin. The OAuth check opens Chrome for interactive sign-in, return navigation, refresh persistence, logout, and the protected dashboard.
 
 ### Implemented API
 
@@ -187,7 +204,8 @@ python scripts/build-demo-gif.py --milestone m4
 | PATCH | `/api/quests/:id` | Creator/admin partial update; `{ quest }` |
 | DELETE | `/api/quests/:id` | Creator/admin deletion with progress cascade; 204 |
 | PUT | `/api/quests/:id/progress` | Save session user's status/notes/repository URL; `{ progress }` |
-| GET | `/api/me/progress` | Authenticated `{ summary, trees }` derived from personal progress |
+| GET | `/api/me/progress` | Authenticated `{ summary, trees, recent_completions }`; latest ten completions, newest first |
+| POST | `/api/reset` | Admin-only transactional default catalog/progress reset; preserves accounts, roles, and sessions |
 | GET | `/auth/github` | Start GitHub sign-in; accepts a local `returnTo` path |
 | GET | `/auth/callback` | Verify OAuth state and establish a PostgreSQL-backed session |
 | GET | `/auth/me` | Current `{ user }`, or 401 |
@@ -197,6 +215,6 @@ Quest writes accept `skill_tree_id`, `title`, `description`, `requirements`, `di
 
 Progress accepts `status` (`backlog`, `in_progress`, `completed`), `notes`, and `repository_url`. Omitted fields preserve existing values; blank/null optional text clears it. Completion snapshots reward/time once, reopening clears that award/time, and later reward edits do not change saved awards. Ownership, roles, timestamps, and earned XP are server-controlled.
 
-See the [Milestone 4 progress report](milestones/progress_report_4.md) for the completed sprint, verification, GIFs, and rubric evidence. The progress API is complete; the dashboard portion of Feature 3 remains in M5.
+See the [Milestone 4 progress report](milestones/progress_report_4.md) for the completed sprint, verification, GIFs, and rubric evidence. The M5 dashboard implementation is complete locally; deployment and its recorded evidence are tracked in the M5 report.
 
 See the [Milestone 3 progress report](milestones/progress_report_3.md), [completion plan](milestones/milestone3_plan.md), and [project board](https://github.com/users/bbdevelops/projects/2) for the sprint evidence.
