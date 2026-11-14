@@ -41,7 +41,7 @@ SkillForge draws inspiration from:
 
 ## Features
 
-Completed features are marked ✅. The remaining features are planned for later milestones.
+Completed features are marked ✅. Toast notifications remain tracked separately in teammate-owned issue #15.
 
 ### ✅ 1. Interactive Web Dev Skill Tree Explorer
 Explore specialized developer tracks (e.g., *Frontend Mastery with React*, *Backend & REST API Architecture*, *Database Modeling with PostgreSQL*, and *DevOps & Cloud Deployment*). Clicking into any tree loads dynamic routes (`/trees/:id`) that display sequential coding milestones, prerequisites, and completion progress.
@@ -59,11 +59,11 @@ Developers can manage both core roadmap milestones and custom portfolio challeng
 
 Completed in Milestone 4: database-backed creation, full details, partial updates and tree moves, creator/admin permissions, field validation, and cascading deletion of personal progress.
 
-### 3. Developer Progression & XP Tracker
+### ✅ 3. Developer Progression & XP Tracker
 Developers track their journey as they take on quests. Progress, completion timestamps, earned Dev XP, and repository links/notes are recorded in a dedicated join table.
 - **Relational Model & Custom Feature:** Many-to-Many (`Users` <-> `Quests` via `user_quests` join table featuring unique fields: `status`, `xp_earned`, `completed_at`, and `notes`).
 
-[gif goes here]
+![Your private dashboard: earned XP, track progress, recent completions, persistence, and quest details](docs/gifs/m5-dashboard.gif)
 
 ### ✅ 4. Quest Forge Modal / Slide-Out Pane
 Allows developers to forge new custom coding quests or view deep-dive project criteria within a responsive, accessible modal overlay without navigating away from their current roadmap view.
@@ -77,11 +77,11 @@ Toggle quest statuses (e.g., from *In Progress* to *Completed*) directly on the 
 
 ![Change a quest from Backlog to In Progress and Completed, verify earned XP after refresh, and reopen it to clear the award.](docs/gifs/m4-status-xp.gif)
 
-### 6. Database Default State Reset
+### ✅ 6. Database Default State Reset
 A dedicated reset feature that restores the PostgreSQL database to its clean default state pre-loaded with curated developer skill tracks, standard coding challenges, and starter progress.
 - **Baseline Feature:** Database reset endpoint & seed script (`POST /api/reset`).
 
-[gif goes here]
+![Owner-confirmed global reset restores defaults while preserving accounts, roles, and sessions](docs/gifs/m5-database-reset.gif)
 
 ### 7. Action Feedback & Toast Notification System (Stretch Feature)
 Delivers immediate feedback via toast alerts when quests are created, edited, or completed, accompanied by loading spinners and dynamic button disabling during async submissions.
@@ -89,12 +89,17 @@ Delivers immediate feedback via toast alerts when quests are created, edited, or
 
 ---
 
-M5 repository implementation is ready for deployment. Follow the [Render setup runbook](docs/render-deployment.md) to configure the existing database and private OAuth settings. Production verification and the final GIFs follow that owner setup checkpoint; toast work remains teammate-owned.
 
-### 8. Quest Filtering & Sorting (Custom Feature)
+### ✅ 8. Quest Filtering & Sorting (Custom Feature)
 Filter a roadmap by difficulty and personal status, or sort by roadmap order, highest XP, and title. Combined filters show matching counts without changing the full track completion or XP totals. Public visitors can filter difficulty and sort; personal-status filtering requires sign-in.
 
-Implemented in M5; deployed walkthrough evidence is pending the Render setup checkpoint.
+![Combine difficulty and status filters, inspect empty results, clear filters, and sort by XP](docs/gifs/m5-quest-filters.gif)
+
+## Final Project Walkthrough
+
+SkillForge is deployed at [the public Render app](https://skillforge-ckbo.onrender.com/). Real GitHub sessions, CRUD, progress, dashboard links, filtering, and owner-confirmed reset were verified on the deployed application. See the [deployment runbook](docs/render-deployment.md) and [M5 progress report](milestones/progress_report_5.md). Toast work remains teammate-owned.
+
+![Complete deployed SkillForge walkthrough](docs/gifs/m5-final-walkthrough.gif)
 
 ## Installation Instructions
 
@@ -125,7 +130,7 @@ Use Render's **external** hostname, database, user, and password in `PGHOST`, `P
 npm run seed
 ```
 
-The seed command transactionally rebuilds the project's four domain tables, so use a dedicated development database. It creates four tracks, twelve quests, a demo developer and admin, and starter progress. Alex starts with **100 XP**, **1/12 quests completed**, **1 in progress**, and **1/3 completed in React**. Repeated runs restore these defaults. The reusable catalog seed preserves identities/roles for the future reset feature; the CLI schema rebuild is intended for development setup.
+The seed command transactionally rebuilds the project's four domain tables, so use a dedicated development database. It creates four tracks, twelve quests, a demo developer and admin, and starter progress. Alex starts with **100 XP**, **1/12 quests completed**, **1 in progress**, and **1/3 completed in React**. Repeated runs restore these defaults. The reusable catalog seed preserves identities/roles for the admin reset feature; the CLI schema rebuild is intended for development setup.
 
 ### 4. Start the application
 
@@ -162,7 +167,7 @@ For M5 deployment, configure HTTPS, `NODE_ENV=production`, a production callback
 ### Verification
 
 ```bash
-npm test           # 31 PostgreSQL/API integration tests in disposable test schemas
+npm test           # 32 PostgreSQL/API integration tests in disposable test schemas
 npm run lint
 npm run build
 npm run test:browser
@@ -197,7 +202,7 @@ The deployed smoke check saves the public origin under ignored `.artifacts/m5/`;
 | Method | Endpoint | Response |
 | --- | --- | --- |
 | GET | `/api/health` | Database health; 200 `{ "ok": true }` or 503 `{ "ok": false }` |
-| GET | `/api/trees` | Trees, quest/completion counts, demo user, and XP/progress summary |
+| GET | `/api/trees` | Trees, quest/completion counts, session user, and XP/progress summary |
 | GET | `/api/trees/:id` | One tree and quests ordered by position then ID, with personal status |
 | GET | `/api/quests/:id` | Full shared quest and current user's personal progress, or null |
 | POST | `/api/quests` | Create a quest owned by the session user; 201 `{ quest }` |
@@ -215,6 +220,6 @@ Quest writes accept `skill_tree_id`, `title`, `description`, `requirements`, `di
 
 Progress accepts `status` (`backlog`, `in_progress`, `completed`), `notes`, and `repository_url`. Omitted fields preserve existing values; blank/null optional text clears it. Completion snapshots reward/time once, reopening clears that award/time, and later reward edits do not change saved awards. Ownership, roles, timestamps, and earned XP are server-controlled.
 
-See the [Milestone 4 progress report](milestones/progress_report_4.md) for the completed sprint, verification, GIFs, and rubric evidence. The M5 dashboard implementation is complete locally; deployment and its recorded evidence are tracked in the M5 report.
+See the [Milestone 4 progress report](milestones/progress_report_4.md) for the completed sprint, verification, GIFs, and rubric evidence. The dashboard, deployment, and recorded evidence are documented in the [M5 progress report](milestones/progress_report_5.md).
 
 See the [Milestone 3 progress report](milestones/progress_report_3.md), [completion plan](milestones/milestone3_plan.md), and [project board](https://github.com/users/bbdevelops/projects/2) for the sprint evidence.
