@@ -87,6 +87,19 @@ After deployment:
 - Update README, `milestones/milestone5.md`, and the M5 progress report with the verified public URL, released commit, test results, and recordings.
 - Close only completed issues and recheck board statuses after PR merges. Keep teammate-owned toast issue #15 separate.
 
+The recording sequence uses these commands once the public URL is available:
+
+```powershell
+npm.cmd run test:deployed -- https://your-service.onrender.com
+npm.cmd run admin:grant -- --github-id 215321334
+npm.cmd run test:oauth
+npm.cmd run db:backup
+npm.cmd run record:m5
+python scripts/build-demo-gif.py --milestone m5
+```
+
+The read-only deployment check saves the canonical origin for the OAuth and recording commands. The OAuth check opens Chrome for real sign-in. The recorder requires matching live verification, an authenticated admin, and a fresh verified backup; it stops at the reset confirmation for the owner to click. If a run is interrupted before reset, it removes only the temporary quests created by that recording. It never confirms the global reset automatically.
+
 Free web services sleep after idle periods; allow the service to finish waking before the demo. The existing database's reported remaining lifetime covers the November 15 target and November 17 final submission window. Record the actual expiration in Render for any later demo.
 
 References: [Render web services](https://render.com/docs/web-services), [Node version](https://render.com/docs/node-version), [PostgreSQL connections](https://render.com/docs/postgresql-creating-connecting), [Free service behavior](https://render.com/docs/free).

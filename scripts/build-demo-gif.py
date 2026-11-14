@@ -6,9 +6,9 @@ from PIL import Image
 
 root = Path(__file__).resolve().parent.parent
 parser = argparse.ArgumentParser()
-parser.add_argument('--milestone', choices=['m3', 'm4'], default='m3')
+parser.add_argument('--milestone', choices=['m3', 'm4', 'm5'], default='m3')
 args = parser.parse_args()
-sources = [('frames.json', 'skill-tree-explorer')] if args.milestone == 'm3' else [('crud-frames.json', 'quest-crud'), ('panes-frames.json', 'quest-panes'), ('status-frames.json', 'status-xp')]
+sources = {'m3': [('frames.json', 'skill-tree-explorer')], 'm4': [('crud-frames.json', 'quest-crud'), ('panes-frames.json', 'quest-panes'), ('status-frames.json', 'status-xp')], 'm5': [('dashboard-frames.json', 'dashboard'), ('reset-frames.json', 'database-reset'), ('filters-frames.json', 'quest-filters'), ('final-frames.json', 'final-walkthrough')]}[args.milestone]
 for source, label in sources:
     manifest = json.loads((root / '.artifacts' / args.milestone / source).read_text())
     frames = []

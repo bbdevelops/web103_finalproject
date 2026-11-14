@@ -21,6 +21,7 @@
     "test:browser": "node scripts/verify-browser-m5.mjs",
     "test:production": "node scripts/verify-production.mjs",
     "test:deployed": "node scripts/verify-deployed.mjs",
+    "record:m5": "node scripts/record-m5.mjs",
     "test:oauth": "node scripts/verify-oauth.mjs",
     "lint": "npm run lint --workspace=client",
     "build": "npm run build --workspace=client"
