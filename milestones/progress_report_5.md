@@ -4,7 +4,7 @@
 
 Live application: [SkillForge](https://skillforge-ckbo.onrender.com/).
 
-The functional release was merged in [PR #21](https://github.com/bbdevelops/web103_finalproject/pull/21); [PR #22](https://github.com/bbdevelops/web103_finalproject/pull/22) fixed canonical origin handling and supplied the deployed recording tools. The final evidence release adds the recorded walkthroughs and completed submission documents to main.
+The functional release was merged in [PR #21](https://github.com/bbdevelops/web103_finalproject/pull/21); [PR #22](https://github.com/bbdevelops/web103_finalproject/pull/22) fixed canonical origin handling and supplied the deployed recording tools. [PR #23](https://github.com/bbdevelops/web103_finalproject/pull/23) adds the recorded walkthroughs and completed submission documents to main.
 
 Completion percentage for Milestone 5 - Unit 9: **83.33% (5 closed / 6 total)**. Dashboard #13, reset #14, deployment #16, filtering #19, and final evidence #20 are complete with checked acceptance criteria and Done board states. Toast issue #15 remains open and teammate-owned; it was not moved out of M5 or claimed complete here.
 
