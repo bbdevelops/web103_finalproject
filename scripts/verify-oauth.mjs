@@ -23,11 +23,19 @@ const context = await chromium.launchPersistentContext(
       process.env.CHROME_PATH ??
       (existsSync(installedChrome) ? installedChrome : undefined),
     headless: false,
+    chromiumSandbox: true,
     viewport: { width: 1280, height: 900 },
   },
 );
 try {
   const page = context.pages()[0] ?? (await context.newPage());
+  // A prior interrupted check may have left this persistent profile signed in.
+  const initialLogout = await context.request.post(`${origin}/auth/logout`);
+  assert.equal(
+    initialLogout.status(),
+    204,
+    "The deployed origin must permit sign-out before OAuth verification.",
+  );
   await page.goto(`${origin}/trees/1`);
   await page
     .getByRole("button", { name: "Sign in with GitHub", exact: true })
@@ -44,7 +52,17 @@ try {
   const me = await context.request.get(`${origin}/auth/me`);
   assert.equal(me.status(), 200);
   await page.reload();
+  const logoutReply = page.waitForResponse(
+    (response) =>
+      response.url() === `${origin}/auth/logout` &&
+      response.request().method() === "POST",
+  );
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  assert.equal(
+    (await logoutReply).status(),
+    204,
+    "Sign-out must succeed at the deployed origin.",
+  );
   await page
     .getByRole("button", { name: "Sign in with GitHub", exact: true })
     .waitFor();

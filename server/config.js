@@ -11,6 +11,21 @@ export const ADMIN_GITHUB_ID = "skillforge:admin";
 // Demo identities are available only through explicit test injection.
 export const demoAuthEnabled = false;
 
+export function clientOriginFor(options = {}) {
+  const url = new URL(
+    options.clientOrigin ??
+      process.env.CLIENT_ORIGIN ??
+      "http://127.0.0.1:5173",
+  );
+  if (
+    !["http:", "https:"].includes(url.protocol) ||
+    url.username ||
+    url.password
+  )
+    throw new Error("CLIENT_ORIGIN must be an HTTP(S) application URL.");
+  return url.origin;
+}
+
 export function databaseOptions(overrides = {}) {
   const connectionString = process.env.DATABASE_URL?.trim();
   const host = connectionString

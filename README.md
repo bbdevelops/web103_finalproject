@@ -4,7 +4,7 @@ CodePath WEB103 Final Project
 
 Designed and developed by: Dilasha Shakya, Erika Villalpando, Manas Singh Bhati, Muhais Olatundun, Brian Brown
 
-🔗 Link to deployed app: [Render Deployment Link Coming in Milestone 5]
+🔗 Link to deployed app: [SkillForge on Render](https://skillforge-ckbo.onrender.com/)
 
 ## About
 

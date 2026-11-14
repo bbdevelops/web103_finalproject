@@ -7,6 +7,7 @@ import { questRoutes } from "./routes/quests.js";
 import { configureAuth } from "./auth.js";
 import { optionalUser, requireUser } from "./middleware/user.js";
 import { resetCatalog } from "./db/reset.js";
+import { clientOriginFor } from "./config.js";
 
 export function createApp({
   pool,
@@ -16,25 +17,21 @@ export function createApp({
   clientDirectory = fileURLToPath(new URL("../client/dist/", import.meta.url)),
 } = {}) {
   const app = express();
+  const clientOrigin = clientOriginFor(auth);
   app.disable("x-powered-by");
   app.use(
     cors({
-      origin:
-        auth.clientOrigin ??
-        process.env.CLIENT_ORIGIN ??
-        "http://127.0.0.1:5173",
+      origin: clientOrigin,
       credentials: true,
     }),
   );
   app.use(express.json());
   // Reject cross-origin writes independently of whether controls are visible.
   app.use((req, res, next) => {
-    const allowed =
-      auth.clientOrigin ?? process.env.CLIENT_ORIGIN ?? "http://127.0.0.1:5173";
     if (
       !["GET", "HEAD", "OPTIONS"].includes(req.method) &&
       req.headers.origin &&
-      req.headers.origin !== allowed
+      req.headers.origin !== clientOrigin
     )
       return res
         .status(403)
@@ -103,12 +100,10 @@ export function createApp({
       await resetCatalog(pool);
       res.json({ ok: true });
     } catch {
-      res
-        .status(503)
-        .json({
-          error:
-            "Reset did not finish. Existing data was preserved. Please try again.",
-        });
+      res.status(503).json({
+        error:
+          "Reset did not finish. Existing data was preserved. Please try again.",
+      });
     }
   });
   app.use(["/api", "/auth"], (_req, res) =>

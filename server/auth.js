@@ -2,6 +2,7 @@ import { Passport } from "passport";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
+import { clientOriginFor } from "./config.js";
 
 export const SESSION_COOKIE = "skillforge.sid";
 const publicUserColumns = "id, github_username, display_name, avatar_url, role";
@@ -37,10 +38,7 @@ export async function upsertGitHubUser(pool, profile) {
 }
 
 export function configureAuth(app, pool, options = {}) {
-  const clientOrigin =
-    options.clientOrigin ??
-    process.env.CLIENT_ORIGIN ??
-    "http://127.0.0.1:5173";
+  const clientOrigin = clientOriginFor(options);
   const secret = options.sessionSecret ?? process.env.SESSION_SECRET;
   const clientID = options.clientID ?? process.env.GITHUB_CLIENT_ID;
   const clientSecret = options.clientSecret ?? process.env.GITHUB_CLIENT_SECRET;
