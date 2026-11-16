@@ -8,11 +8,13 @@ import { configureAuth } from "./auth.js";
 import { optionalUser, requireUser } from "./middleware/user.js";
 import { resetCatalog } from "./db/reset.js";
 import { clientOriginFor } from "./config.js";
+import { cloudStorage, MediaError } from "./media.js";
 
 export function createApp({
   pool,
   demoAuth = false,
   auth = {},
+  media = cloudStorage(),
   serveClient = process.env.NODE_ENV === "production",
   clientDirectory = fileURLToPath(new URL("../client/dist/", import.meta.url)),
 } = {}) {
@@ -57,7 +59,7 @@ export function createApp({
     next();
   });
   app.use("/api/trees", treeRoutes(pool, { demoAuth }));
-  app.use("/api/quests", questRoutes(pool, { demoAuth }));
+  app.use("/api/quests", questRoutes(pool, { demoAuth, media }));
   app.get(
     "/api/me/progress",
     requireUser(pool, { demoAuth }),
@@ -128,6 +130,13 @@ export function createApp({
   );
   app.use((error, _req, res, next) => {
     if (res.headersSent) return next(error);
+    if (error instanceof MediaError)
+      return res
+        .status(error.status)
+        .json({
+          error: error.message,
+          ...(error.fields ? { errors: error.fields } : {}),
+        });
     if (error.type === "entity.parse.failed")
       return res
         .status(400)

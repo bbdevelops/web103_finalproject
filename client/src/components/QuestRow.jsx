@@ -1,3 +1,4 @@
+import { ActionButton } from "./ActionButton.jsx";
 import { Icon } from "./Icon.jsx";
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
@@ -72,12 +73,12 @@ export function QuestRow({ quest, index, onView }) {
           </span>
         </div>
         <div className="quest-actions">
-          <button
+          <ActionButton
             className="text-button"
             onClick={(event) => onView(quest.id, event.currentTarget)}
           >
             View quest <Icon name="arrow" size={14} />
-          </button>
+          </ActionButton>
           {user ? (
             <label className="status-control">
               My status
@@ -98,21 +99,21 @@ export function QuestRow({ quest, index, onView }) {
               {pending && <span role="status">Saving…</span>}
             </label>
           ) : (
-            <button className="text-button" onClick={signIn}>
+            <ActionButton className="text-button" onClick={signIn}>
               Sign in to track
-            </button>
+            </ActionButton>
           )}
         </div>
         {error && (
           <p role="alert" className="inline-error">
             {error}{" "}
-            <button
+            <ActionButton
               className="text-button"
               disabled={pending}
               onClick={() => saveStatus(retryStatus)}
             >
               Retry status save
-            </button>
+            </ActionButton>
           </p>
         )}
       </div>

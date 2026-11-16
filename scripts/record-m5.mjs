@@ -4,13 +4,15 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { chromium } from "playwright";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 const output = resolve(".artifacts/m5");
 const proof = (name) =>
   readFile(resolve(output, name), "utf8").then(JSON.parse);
 const deployed = await proof("deployment-checks.json");
 const oauth = await proof("oauth-checks.json");
-const backup = await proof("backups/latest.json");
+let backup = await proof("backups/latest.json");
 assert.ok(
   deployed.passed && oauth.realGitHubSignIn && oauth.origin === deployed.origin,
 );
@@ -42,11 +44,23 @@ const context = await chromium.launchPersistentContext(
     reducedMotion: "reduce",
   },
 );
-const manifests = { dashboard: [], reset: [], filters: [], final: [] },
+const manifests = {
+    dashboard: [],
+    reset: [],
+    filters: [],
+    covers: [],
+    buttons: [],
+    final: [],
+  },
   created = new Set();
 const errors = [];
 let resetDone = false,
   sequence = 0;
+const frameDirectory = resolve(
+  output,
+  "frames",
+  `rubric-${new Date().toISOString().replaceAll(":", "-")}`,
+);
 try {
   const page = context.pages()[0] ?? (await context.newPage());
   page.setDefaultTimeout(60000);
@@ -59,17 +73,29 @@ try {
     "admin",
     "Provision the approved owner identity first.",
   );
-  await mkdir(resolve(output, "frames"), { recursive: true });
+  await mkdir(frameDirectory, { recursive: true });
   async function frame(groups, label, duration = 1800) {
     await page.evaluate(() => document.fonts.ready);
     const path = resolve(
-      output,
-      "frames",
+      frameDirectory,
       `${String(sequence++).padStart(2, "0")}-${label}.png`,
     );
     await page.screenshot({ path, animations: "disabled" });
     for (const group of new Set([...groups, "final"]))
       manifests[group].push({ path, duration });
+    for (const [name, frames] of Object.entries(manifests))
+      await writeFile(
+        resolve(output, `${name}-frames.json`),
+        JSON.stringify(frames, null, 2),
+      );
+    await writeFile(
+      resolve(output, "recording-session.json"),
+      JSON.stringify(
+        { frameDirectory, origin, groups: Object.keys(manifests) },
+        null,
+        2,
+      ),
+    );
   }
   const row = (title) =>
     page
@@ -99,7 +125,7 @@ try {
   );
   await page
     .getByRole("heading", { name: "Your developer dashboard", exact: true })
-    .waitFor({ timeout: 600000 });
+    .waitFor({ timeout: 0 });
   await frame(["dashboard"], "protected-dashboard", 2400);
   // Make real loading/pending states readable in the recording without mocking responses.
   const network = await context.newCDPSession(page);
@@ -162,13 +188,53 @@ try {
     await page.getByLabel("Title *", { exact: true }).isDisabled(),
     true,
   );
-  await frame([], "submission-pending");
+  await frame(["buttons"], "submission-pending");
   const questId = (await (await createReply).json()).quest.id;
   created.add(questId);
   await row(title).waitFor();
   await row(title).scrollIntoViewIfNeeded();
   await frame([], "quest-created");
+  const coverFile = resolve(output, "project-cover.png");
+  await page.screenshot({ path: coverFile, animations: "disabled" });
   await row(title).getByRole("button", { name: "View quest" }).click();
+  await page.getByLabel("Image file", { exact: true }).setInputFiles(coverFile);
+  await page
+    .getByLabel("Image description", { exact: true })
+    .fill("SkillForge roadmap and portfolio quest");
+  await frame(["covers"], "cover-selected");
+  await button("Upload cover").click();
+  await button("Saving cover…").waitFor();
+  assert.equal(await button("Close pane").isDisabled(), true);
+  await frame(["covers", "buttons"], "cover-upload-pending");
+  await page
+    .getByAltText("SkillForge roadmap and portfolio quest", { exact: true })
+    .waitFor();
+  await page
+    .locator(".toast-title", { hasText: "Quest cover saved" })
+    .waitFor();
+  await frame(["covers"], "cloud-cover-saved");
+  await page.reload();
+  await row(title).getByRole("button", { name: "View quest" }).click();
+  await page
+    .getByAltText("SkillForge roadmap and portfolio quest", { exact: true })
+    .waitFor();
+  await frame(["covers"], "cloud-cover-persists");
+  await page.getByLabel("Image file", { exact: true }).setInputFiles(coverFile);
+  await page
+    .getByLabel("Image description", { exact: true })
+    .fill("Updated SkillForge project screenshot");
+  await button("Replace cover").click();
+  await page
+    .getByAltText("Updated SkillForge project screenshot", { exact: true })
+    .waitFor();
+  await frame(["covers"], "cloud-cover-replaced");
+  await button("Remove cover").click();
+  await frame(["covers"], "remove-cover-confirmation");
+  await button("Confirm remove cover").click();
+  await page
+    .getByAltText("Updated SkillForge project screenshot", { exact: true })
+    .waitFor({ state: "detached" });
+  await frame(["covers"], "cloud-cover-removed");
   await page
     .getByLabel("Notes", { exact: true })
     .fill("Validated and deployed with integration and browser checks.");
@@ -246,6 +312,8 @@ try {
     await frame(["filters"], "empty-filter-results");
   }
   await button("Clear filters").click();
+  assert.equal(await button("Clear filters").isDisabled(), true);
+  await frame(["buttons"], "filter-click-guard");
   await page.getByLabel("Sort quests", { exact: true }).selectOption("xp");
   await row(edited).waitFor();
   await frame(["filters"], "highest-xp-first");
@@ -272,6 +340,20 @@ try {
   assert.equal(sample.status(), 201);
   const sampleId = (await sample.json()).quest.id;
   created.add(sampleId);
+  const sampleCover = await context.request.post(
+    `${origin}/api/quests/${sampleId}/image`,
+    {
+      multipart: {
+        image: {
+          name: "project-cover.png",
+          mimeType: "image/png",
+          buffer: await readFile(coverFile),
+        },
+        alt_text: "Temporary cover included in the verified reset backup",
+      },
+    },
+  );
+  assert.equal(sampleCover.status(), 201);
   assert.equal(
     (
       await context.request.put(`${origin}/api/quests/${sampleId}/progress`, {
@@ -287,6 +369,21 @@ try {
   await page
     .getByRole("link", { name: "Reset demonstration quest", exact: true })
     .waitFor();
+  await promisify(execFile)(process.execPath, ["scripts/backup-database.mjs"], {
+    windowsHide: true,
+  });
+  backup = await proof("backups/latest.json");
+  assert.ok(
+    backup.mediaVerified &&
+      backup.images.some((image) => image.quest_id === sampleId),
+  );
+  for (const image of backup.images)
+    assert.equal(
+      createHash("sha256")
+        .update(await readFile(image.file))
+        .digest("hex"),
+      image.sha256,
+    );
   await frame(["reset"], "before-global-reset");
   await button("Reset database").click();
   await page.getByRole("dialog").waitFor();
@@ -341,6 +438,8 @@ try {
         ownerConfirmedReset: true,
         backupSha256: backup.sha256,
         defaultCatalogVerified: true,
+        realCloudinaryUploads: true,
+        privateMediaBackupVerified: backup.mediaVerified,
         flows: Object.keys(manifests),
         browserErrors: errors,
         recordedAt: new Date().toISOString(),
@@ -350,7 +449,7 @@ try {
     ),
   );
   console.log(
-    "PASS deployed walkthrough, three feature recordings, owner-confirmed reset, and logout.",
+    "PASS deployed walkthrough, five feature recordings, real cloud uploads, owner-confirmed reset, and logout.",
   );
 } finally {
   if (!resetDone)

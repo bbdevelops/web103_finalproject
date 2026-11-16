@@ -1,3 +1,4 @@
+import { ActionButton } from "./ActionButton.jsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -127,18 +128,18 @@ export function Layout() {
                   </span>
                 )}
                 <span className="account-name">{user.display_name}</span>
-                <button
+                <ActionButton
                   className="text-button"
                   onClick={logout}
                   disabled={loggingOut}
                 >
                   {loggingOut ? "Signing out…" : "Sign out"}
-                </button>
+                </ActionButton>
               </>
             ) : (
-              <button className="button secondary" onClick={signIn}>
+              <ActionButton className="button secondary" onClick={signIn}>
                 Sign in with GitHub
-              </button>
+              </ActionButton>
             )}
           </div>
         </div>
@@ -147,9 +148,9 @@ export function Layout() {
         {accountError && (
           <div className="inline-error" role="alert">
             {accountError}{" "}
-            <button className="text-button" onClick={signIn}>
+            <ActionButton className="text-button" onClick={signIn}>
               Retry sign-in
-            </button>
+            </ActionButton>
           </div>
         )}
         <Outlet

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { requireUser } from "../middleware/user.js";
+import { imageRoutes } from "./images.js";
+import { imageView, queueDeletion, withManagedQuest } from "../media.js";
 import {
   httpUrl,
   questFields,
@@ -29,6 +31,7 @@ export function questRoutes(pool, options) {
     }
     return result;
   };
+  router.use("/:id/image", authenticated, imageRoutes(pool, options.media));
   router.get("/:id", async (req, res) => {
     const {
       rows: [quest],
@@ -41,7 +44,13 @@ export function questRoutes(pool, options) {
       "SELECT status, xp_earned, completed_at, notes, repository_url FROM user_quests WHERE user_id=$1 AND quest_id=$2",
       [req.user?.id ?? null, quest.id],
     );
-    res.json({ quest, progress: progress ?? null });
+    const {
+      rows: [image],
+    } = await pool.query(
+      "SELECT secure_url,alt_text,width,height FROM quest_images WHERE quest_id=$1",
+      [quest.id],
+    );
+    res.json({ quest, progress: progress ?? null, image: imageView(image) });
   });
   router.post("/", authenticated, async (req, res) => {
     const { values, errors } = await validate(req.body ?? {}, false);
@@ -65,11 +74,9 @@ export function questRoutes(pool, options) {
     if (!existing)
       return res.status(404).json({ error: "This quest could not be found." });
     if (!canManage(req.user, existing))
-      return res
-        .status(403)
-        .json({
-          error: "Only the creator or an administrator can change this quest.",
-        });
+      return res.status(403).json({
+        error: "Only the creator or an administrator can change this quest.",
+      });
     const { values, errors } = await validate(req.body ?? {}, true);
     if (Object.keys(errors).length)
       return res
@@ -88,18 +95,21 @@ export function questRoutes(pool, options) {
     res.json({ quest });
   });
   router.delete("/:id", authenticated, async (req, res) => {
-    const {
-      rows: [quest],
-    } = await pool.query("SELECT * FROM quests WHERE id=$1", [req.params.id]);
-    if (!quest)
-      return res.status(404).json({ error: "This quest could not be found." });
-    if (!canManage(req.user, quest))
-      return res
-        .status(403)
-        .json({
-          error: "Only the creator or an administrator can delete this quest.",
-        });
-    await pool.query("DELETE FROM quests WHERE id=$1", [quest.id]);
+    await withManagedQuest(
+      pool,
+      req.params.id,
+      req.user,
+      async (client, quest) => {
+        const {
+          rows: [image],
+        } = await client.query(
+          "SELECT public_id FROM quest_images WHERE quest_id=$1",
+          [quest.id],
+        );
+        if (image) await queueDeletion(client, image.public_id);
+        await client.query("DELETE FROM quests WHERE id=$1", [quest.id]);
+      },
+    );
     res.sendStatus(204);
   });
   router.put("/:id/progress", authenticated, async (req, res) => {

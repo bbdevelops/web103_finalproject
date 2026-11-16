@@ -1,3 +1,5 @@
+import { useGuardedSubmit } from "../hooks/useGuardedSubmit.js";
+import { ActionButton } from "./ActionButton.jsx";
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useApiResource } from "../hooks/useApiResource.js";
@@ -123,6 +125,7 @@ export function QuestForm({ quest, treeId, onClose, onSaved, restoreFocusTo }) {
       setPending(false);
     }
   }
+  const submit = useGuardedSubmit(save);
   return (
     <QuestDialog
       title={quest ? "Edit quest" : "Forge Quest"}
@@ -130,7 +133,7 @@ export function QuestForm({ quest, treeId, onClose, onSaved, restoreFocusTo }) {
       pending={pending}
       restoreFocusTo={restoreFocusTo}
     >
-      <form onSubmit={save} noValidate className="pane-body">
+      <form onSubmit={submit} noValidate className="pane-body">
         <p className="pane-intro">
           Turn your next project into an achievable milestone. Shared quest
           content is visible to everyone.
@@ -139,18 +142,18 @@ export function QuestForm({ quest, treeId, onClose, onSaved, restoreFocusTo }) {
           <div role="alert" className="inline-error">
             {error}{" "}
             {sessionExpired && (
-              <button type="button" className="text-button" onClick={signIn}>
+              <ActionButton type="button" className="text-button" onClick={signIn}>
                 Sign in
-              </button>
+              </ActionButton>
             )}
           </div>
         )}
         {treesError && (
           <div role="alert">
             Could not load skill trees.{" "}
-            <button type="button" onClick={retry}>
+            <ActionButton type="button" onClick={retry}>
               Try again
-            </button>
+            </ActionButton>
           </div>
         )}
         <fieldset disabled={pending} className="quest-fields">
@@ -212,17 +215,17 @@ export function QuestForm({ quest, treeId, onClose, onSaved, restoreFocusTo }) {
           )}
         </fieldset>
         <footer className="pane-footer">
-          <button
+          <ActionButton
             type="button"
             className="button secondary"
             onClick={close}
             disabled={pending}
           >
             Cancel
-          </button>
-          <button className="button primary" disabled={pending || !data}>
+          </ActionButton>
+          <ActionButton type="submit" className="button primary" disabled={pending || !data}>
             {pending ? "Saving…" : quest ? "Save changes" : "Create quest"}
-          </button>
+          </ActionButton>
         </footer>
       </form>
     </QuestDialog>

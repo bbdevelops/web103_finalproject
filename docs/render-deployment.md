@@ -105,3 +105,9 @@ To resume only an interrupted final reset step after the earlier real walkthroug
 Free web services sleep after idle periods; allow the service to finish waking before the demo. The existing database's reported remaining lifetime covers the November 15 target and November 17 final submission window. Record the actual expiration in Render for any later demo.
 
 References: [Render web services](https://render.com/docs/web-services), [Node version](https://render.com/docs/node-version), [PostgreSQL connections](https://render.com/docs/postgresql-creating-connecting), [Free service behavior](https://render.com/docs/free).
+
+## Quest-cover release
+
+Follow [quest-cover setup and operations](quest-covers.md) for the three private Cloudinary environment values. Take a fresh private backup before the first deployment. The server applies an additive media migration before listening; existing identities, roles, sessions, quests, and progress remain intact. Build/start never execute the destructive development seed.
+
+The final recorder now demonstrates real cover uploads, replacement/removal, click guards, and the existing toasts. It takes another media-aware private backup before pausing at the owner-confirmed reset. Genuine frame manifests are checkpointed after each capture, so interruption does not discard completed evidence.

@@ -1,3 +1,4 @@
+import { ActionButton } from "../components/ActionButton.jsx";
 import { useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -104,7 +105,7 @@ export function TreeDetailPage() {
       {linkError && (
         <p className="inline-error" role="alert">
           {linkError}{" "}
-          <button
+          <ActionButton
             className="text-button"
             onClick={() => {
               closePane();
@@ -112,7 +113,7 @@ export function TreeDetailPage() {
             }}
           >
             Dismiss
-          </button>
+          </ActionButton>
         </p>
       )}
       {error && <ErrorState error={error} retry={retry} />}
@@ -142,9 +143,9 @@ export function TreeDetailPage() {
             </span>
           )}
           {progress.error && (
-            <button className="text-button" onClick={progress.retry}>
+            <ActionButton className="text-button" onClick={progress.retry}>
               Retry XP summary
-            </button>
+            </ActionButton>
           )}
           <strong>
             {tree.completed_count}
@@ -167,7 +168,7 @@ export function TreeDetailPage() {
               <span className="eyebrow">BUILD WITH INTENTION</span>
               <h2 id="quests-heading">The quest roadmap</h2>
             </div>
-            <button
+            <ActionButton
               className="button secondary"
               onClick={(event) =>
                 user
@@ -176,7 +177,7 @@ export function TreeDetailPage() {
               }
             >
               <span aria-hidden="true">+</span> Forge Quest
-            </button>
+            </ActionButton>
           </div>
           <QuestFilters
             value={filters}
@@ -205,12 +206,12 @@ export function TreeDetailPage() {
                 <EmptyState title="No quests match these filters.">
                   Try a different difficulty or status.
                 </EmptyState>
-                <button
+                <ActionButton
                   className="button secondary"
                   onClick={() => setFilters(defaults)}
                 >
                   Show all quests
-                </button>
+                </ActionButton>
               </div>
             )
           ) : (

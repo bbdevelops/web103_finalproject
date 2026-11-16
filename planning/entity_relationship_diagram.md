@@ -1,5 +1,23 @@
 # SkillForge Entity Relationship Diagram
 
+## M5 implementation extension
+
+The historical diagram below records the original four-table design. The M5 cover feature adds `quest_images`: `quest_id` is both its primary key and a foreign key to `quests(id) ON DELETE CASCADE`. Each quest therefore has zero or one image, and every image belongs to exactly one quest. The primary key enforces this one-to-one relationship in the actual database. `public_id` is also unique; HTTPS URL, alt text, dimensions, and update time describe the uploaded image. A separate `image_deletion_jobs` infrastructure table records retryable remote cleanup. The migration and fresh-schema seed both apply `server/db/media.sql`.
+
+```mermaid
+erDiagram
+    quests ||--o| quest_images : has_cover
+    quest_images {
+        integer quest_id PK,FK
+        text public_id UK
+        text secure_url
+        text alt_text
+        integer width
+        integer height
+        timestamptz updated_at
+    }
+```
+
 This proposed PostgreSQL domain model supports the README's catalog, quest CRUD, GitHub identities, and personal progress. It describes the planned database; this milestone does not create tables or migrations.
 
 ## List of Tables

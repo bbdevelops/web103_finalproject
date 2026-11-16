@@ -1,3 +1,4 @@
+import { ActionButton } from "./ActionButton.jsx";
 import { useId } from "react";
 
 export function QuestFilters({
@@ -63,9 +64,9 @@ export function QuestFilters({
         <span aria-live="polite">
           Showing {count} of {total} quests
         </span>
-        <button className="text-button" onClick={onClear}>
+        <ActionButton className="text-button" onClick={onClear}>
           Clear filters
-        </button>
+        </ActionButton>
       </div>
     </div>
   );

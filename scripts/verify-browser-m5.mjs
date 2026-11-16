@@ -4,6 +4,7 @@ import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { chromium } from "playwright";
+import sharp from "sharp";
 import { createServer } from "vite";
 import { createApp } from "../server/app.js";
 import { createPool } from "../server/db/pool.js";
@@ -17,6 +18,8 @@ const adminPool = createPool({ max: 1 });
 const output = resolve(".artifacts/m5/browser");
 const checks = [],
   errors = [];
+const observedButtons = [];
+const browserImages = new Map();
 let pool, app, apiServer, vite, browser, page;
 const origin = "http://127.0.0.1:5174";
 const chrome = "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -35,6 +38,23 @@ try {
   await initializeDatabase(pool);
   app = createApp({
     pool,
+    media: {
+      configured: true,
+      async upload(buffer, publicId) {
+        const metadata = await sharp(buffer).metadata();
+        browserImages.set(publicId, buffer);
+        return {
+          public_id: publicId,
+          secure_url: `https://fixture.invalid/${encodeURIComponent(publicId)}.webp`,
+          width: metadata.width,
+          height: metadata.height,
+        };
+      },
+      async destroy(publicId) {
+        browserImages.delete(publicId);
+        return { result: "ok" };
+      },
+    },
     auth: {
       schemaName: schema,
       sessionSecret: "isolated-browser-test-secret",
@@ -70,6 +90,37 @@ try {
     reducedMotion: "reduce",
   });
   page = await context.newPage();
+  await context.route("https://fixture.invalid/**", async (route) => {
+    const publicId = decodeURIComponent(
+      new URL(route.request().url()).pathname.slice(1, -5),
+    );
+    const buffer = browserImages.get(publicId);
+    await route.fulfill(
+      buffer
+        ? { status: 200, contentType: "image/webp", body: buffer }
+        : { status: 404 },
+    );
+  });
+  await page.exposeFunction("auditButtons", (observation) =>
+    observedButtons.push(observation),
+  );
+  await page.addInitScript(() => {
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (!event.target.closest("button")) return;
+        const all = [...document.querySelectorAll("button")].filter(
+          (button) => button.getClientRects().length,
+        );
+        window.auditButtons({
+          total: all.length,
+          guarded: all.filter((button) => button.dataset.clickGuard === "true")
+            .length,
+        });
+      },
+      true,
+    );
+  });
   let provider = "alex",
     cancelSignIn = false,
     authorizationCount = 0;
@@ -662,6 +713,175 @@ try {
   );
   pass(
     "admin reset supports cancellation, failure recovery, disabled pending controls, and preserved sessions",
+  );
+
+  await page.goto(`${origin}/trees/1`);
+  await row("HTML & CSS foundations")
+    .getByRole("button", { name: "View quest" })
+    .click();
+  const imageFile = await sharp({
+    create: { width: 80, height: 60, channels: 3, background: "#a2dd45" },
+  })
+    .png()
+    .toBuffer();
+  await page.getByLabel("Image file", { exact: true }).setInputFiles({
+    name: "project.png",
+    mimeType: "image/png",
+    buffer: imageFile,
+  });
+  await page
+    .getByLabel("Image description", { exact: true })
+    .fill("A project screenshot");
+  await page.route("**/api/quests/1/image", (route) =>
+    route.fulfill({ status: 503, json: { error: "Temporary image failure" } }),
+  );
+  await page.getByRole("button", { name: "Upload cover", exact: true }).click();
+  await page
+    .getByRole("alert")
+    .filter({ hasText: "Temporary image failure" })
+    .waitFor();
+  assert.equal(
+    await page.getByLabel("Image description", { exact: true }).inputValue(),
+    "A project screenshot",
+  );
+  assert.equal(
+    await page
+      .getByLabel("Image file", { exact: true })
+      .evaluate((input) => input.files.length),
+    1,
+  );
+  await page.unroute("**/api/quests/1/image");
+  let releaseImage,
+    imageRequests = 0;
+  const imageGate = new Promise((resolveGate) => {
+    releaseImage = resolveGate;
+  });
+  await page.route("**/api/quests/1/image", async (route) => {
+    imageRequests++;
+    await imageGate;
+    await route.continue();
+  });
+  await page.getByRole("button", { name: "Upload cover", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Saving cover…", exact: true })
+    .waitFor();
+  await page.locator(".quest-cover form").evaluate((form) => {
+    form.requestSubmit();
+    form.requestSubmit();
+  });
+  assert.equal(
+    await page.getByRole("button", { name: "Close pane" }).isDisabled(),
+    true,
+  );
+  assert.equal(
+    await page.getByLabel("Image file", { exact: true }).isDisabled(),
+    true,
+  );
+  releaseImage();
+  await page.getByAltText("A project screenshot", { exact: true }).waitFor();
+  assert.equal(imageRequests, 1);
+  await page.unroute("**/api/quests/1/image");
+  await page.reload();
+  await row("HTML & CSS foundations")
+    .getByRole("button", { name: "View quest" })
+    .click();
+  await page.getByAltText("A project screenshot", { exact: true }).waitFor();
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+    true,
+  );
+  await page
+    .getByLabel("Image file", { exact: true })
+    .setInputFiles({
+      name: "replacement.png",
+      mimeType: "image/png",
+      buffer: imageFile,
+    });
+  await page
+    .getByLabel("Image description", { exact: true })
+    .fill("Replacement project screenshot");
+  await page
+    .getByRole("button", { name: "Replace cover", exact: true })
+    .click();
+  await page
+    .getByAltText("Replacement project screenshot", { exact: true })
+    .waitFor();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const guestPage = await browser.newPage();
+  await guestPage.route("https://fixture.invalid/**", async (route) => {
+    const publicId = decodeURIComponent(
+      new URL(route.request().url()).pathname.slice(1, -5),
+    );
+    await route.fulfill({
+      status: 200,
+      contentType: "image/webp",
+      body: browserImages.get(publicId),
+    });
+  });
+  await guestPage.goto(`${origin}/trees/1`);
+  await guestPage.getByRole("button", { name: "View quest" }).first().click();
+  await guestPage
+    .getByAltText("Replacement project screenshot", { exact: true })
+    .waitFor();
+  assert.equal(
+    await guestPage.getByLabel("Image file", { exact: true }).count(),
+    0,
+  );
+  await guestPage.close();
+  await page.getByRole("button", { name: "Remove cover", exact: true }).click();
+  await page.getByRole("button", { name: "Keep cover", exact: true }).click();
+  assert.equal(
+    (await context.request.get(`${origin}/api/quests/1`)).status(),
+    200,
+  );
+  await page.getByRole("button", { name: "Remove cover", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Confirm remove cover", exact: true })
+    .click();
+  await page
+    .getByAltText("Replacement project screenshot", { exact: true })
+    .waitFor({ state: "detached" });
+  await page.getByRole("button", { name: "Close pane", exact: true }).click();
+  pass(
+    "quest covers preserve failed selections, prevent duplicate upload, persist after refresh, and support cancellation/removal",
+  );
+
+  const clearFilters = page
+    .getByRole("button", { name: "Clear filters", exact: true })
+    .first();
+  await clearFilters.evaluate((button) => {
+    button.click();
+    button.click();
+  });
+  assert.equal(await clearFilters.isDisabled(), true);
+  await page.waitForTimeout(800);
+  assert.equal(await clearFilters.isEnabled(), true);
+  const guarded = observedButtons.reduce((sum, item) => sum + item.guarded, 0);
+  const total = observedButtons.reduce((sum, item) => sum + item.total, 0);
+  assert.ok(
+    guarded / total >= 0.75,
+    `Rendered button coverage: ${guarded}/${total}`,
+  );
+  await writeFile(
+    resolve(output, "button-coverage.json"),
+    JSON.stringify(
+      {
+        guarded,
+        total,
+        percentage: (guarded / total) * 100,
+        observationCount: observedButtons.length,
+        definition:
+          "All visible button instances in interaction states, including existing toast controls",
+      },
+      null,
+      2,
+    ),
+  );
+  pass(
+    "click guards disable immediately, recover after cooldown, and cover at least 75% of observed buttons including toast controls",
   );
 
   await page.goto(origin);

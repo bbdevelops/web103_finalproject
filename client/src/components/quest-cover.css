@@ -1,0 +1,22 @@
+.quest-cover {
+  margin-bottom: 24px;
+}
+.quest-cover-image,
+.quest-cover-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.quest-cover-preview {
+  max-height: 180px;
+}
+.quest-cover input[type="file"] {
+  max-width: 100%;
+}
+.quest-cover .text-button {
+  margin-top: 12px;
+}

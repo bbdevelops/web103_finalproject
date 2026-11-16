@@ -3,6 +3,8 @@ import { pathToFileURL } from "node:url";
 import { ADMIN_GITHUB_ID, DEMO_GITHUB_ID } from "../config.js";
 import { createPool } from "./pool.js";
 import { catalog } from "./catalog.js";
+import { ensureMediaTables } from "./migrate.js";
+import { queueAllImages } from "../media.js";
 
 export async function rebuildSchema(client) {
   // Full development rebuilds invalidate sessions before internal user IDs can be reused.
@@ -11,12 +13,17 @@ export async function rebuildSchema(client) {
   } = await client.query("SELECT to_regclass('user_sessions') AS name");
   if (sessions.name) await client.query("DELETE FROM user_sessions");
   // The caller owns the transaction and search_path (public for development, isolated for tests).
+  const {
+    rows: [images],
+  } = await client.query("SELECT to_regclass('quest_images') AS name");
+  if (images.name) await queueAllImages(client);
   await client.query(
-    "DROP TABLE IF EXISTS user_quests, quests, skill_trees, users",
+    "DROP TABLE IF EXISTS quest_images, user_quests, quests, skill_trees, users",
   );
   await client.query(
     await readFile(new URL("./schema.sql", import.meta.url), "utf8"),
   );
+  await ensureMediaTables(client);
 }
 
 export async function seedUsers(client) {
@@ -39,9 +46,10 @@ export async function seedCatalog(client) {
     DEMO_GITHUB_ID,
   ]);
   if (!demo) throw new Error("Seed users before seeding the catalog.");
-  // Preserve identities and roles so the future reset route can reuse this function.
+  // Queue remote cleanup in the same transaction as the catalog reset.
+  await queueAllImages(client);
   await client.query(
-    "TRUNCATE TABLE user_quests, quests, skill_trees RESTART IDENTITY",
+    "TRUNCATE TABLE quest_images, user_quests, quests, skill_trees RESTART IDENTITY",
   );
   const reactQuestIds = [];
   for (const [treeIndex, tree] of catalog.entries()) {
