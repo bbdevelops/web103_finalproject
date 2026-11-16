@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Link,
   NavLink,
@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import { Icon } from "./Icon.jsx";
 import { api } from "../lib/api.js";
+import { useToast } from "../hooks/useToast.js";
 
 export function Layout() {
   const [user, setUser] = useState(null);
@@ -18,13 +19,46 @@ export function Layout() {
   const [loggingOut, setLoggingOut] = useState(false);
   const { pathname, search, hash } = useLocation();
   const navigate = useNavigate();
+  const toast = useToast();
   const invalidate = useCallback(({ reset = false } = {}) => {
     setRevision((value) => value + 1);
     if (reset) setResetRevision((value) => value + 1);
   }, []);
   const signIn = useCallback(() => {
-    window.location.href = `/auth/github?returnTo=${encodeURIComponent(pathname + search.replace(/([?&])authError=[^&]*&?/, "$1").replace(/[?&]$/, "") + hash)}`;
-  }, [pathname, search, hash]);
+    const url = `/auth/github?returnTo=${encodeURIComponent(pathname + search.replace(/([?&])authError=[^&]*&?/, "$1").replace(/[?&]$/, "") + hash)}`;
+    // The current page stays on screen until GitHub responds, so the toast
+    // renders and spins while the redirect is in flight.
+    toast.loading("Taking you to GitHub…", {
+      title: "Signing in",
+      key: "sign-in",
+    });
+    window.location.assign(url);
+  }, [pathname, search, hash, toast]);
+  // Coming back with the browser's Back button restores this page from
+  // cache, so clear the "Signing in" toast instead of leaving it spinning.
+  useEffect(() => {
+    const restored = (event) => {
+      if (event.persisted) toast.dismiss("sign-in");
+    };
+    window.addEventListener("pageshow", restored);
+    return () => window.removeEventListener("pageshow", restored);
+  }, [toast]);
+  // GitHub sends people back with ?authError=… when sign-in is cancelled or
+  // fails. The parameter stays in the URL so the dashboard does not redirect
+  // straight back to GitHub; the toast offers a retry instead.
+  const authFailed = new URLSearchParams(search).has("authError");
+  const signInRef = useRef(signIn);
+  useEffect(() => {
+    signInRef.current = signIn;
+  }, [signIn]);
+  useEffect(() => {
+    if (!authFailed) return;
+    toast.error("Nothing was changed. You can try again.", {
+      title: "GitHub sign-in didn’t finish",
+      key: "auth-error",
+      action: { label: "Try again", onClick: () => signInRef.current() },
+    });
+  }, [authFailed, toast]);
   useEffect(() => {
     const controller = new AbortController();
     api("/auth/me", { signal: controller.signal })
@@ -44,6 +78,10 @@ export function Layout() {
       await api("/auth/logout", { method: "POST" });
       setUser(null);
       invalidate();
+      toast.success("See you next quest.", {
+        title: "Signed out",
+        variant: "signout",
+      });
       if (pathname === "/dashboard") navigate("/");
     } catch (error) {
       setAccountError(error.message);
@@ -106,9 +144,9 @@ export function Layout() {
         </div>
       </header>
       <main id="main" className="main-shell" tabIndex={-1}>
-        {(accountError || new URLSearchParams(search).has("authError")) && (
+        {accountError && (
           <div className="inline-error" role="alert">
-            {accountError || "GitHub sign-in did not finish. Please try again."}{" "}
+            {accountError}{" "}
             <button className="text-button" onClick={signIn}>
               Retry sign-in
             </button>

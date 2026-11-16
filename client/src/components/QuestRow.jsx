@@ -2,6 +2,8 @@ import { Icon } from "./Icon.jsx";
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { api } from "../lib/api.js";
+import { progressKey, toastProgress } from "../lib/toastProgress.js";
+import { useToast } from "../hooks/useToast.js";
 
 const statuses = {
   completed: "Completed",
@@ -12,19 +14,27 @@ const statuses = {
 export function QuestRow({ quest, index, onView }) {
   const { user, signIn, invalidate } = useOutletContext();
   const [pending, setPending] = useState(false);
+  const toast = useToast();
   const [error, setError] = useState("");
   const [retryStatus, setRetryStatus] = useState(null);
   async function saveStatus(status) {
     setPending(true);
     setError("");
     setRetryStatus(status);
+    toast.loading(quest.title, {
+      title: "Saving status…",
+      key: progressKey(quest),
+    });
     try {
-      await api(`/api/quests/${quest.id}/progress`, {
+      const { progress } = await api(`/api/quests/${quest.id}/progress`, {
         method: "PUT",
         body: JSON.stringify({ status }),
       });
+      toastProgress(toast, quest, quest.status, progress);
       invalidate();
     } catch (failure) {
+      // The error and its retry button appear inline beside the status menu.
+      toast.dismiss(progressKey(quest));
       setError(failure.message);
     } finally {
       setPending(false);
