@@ -5,7 +5,9 @@ export async function resetCatalog(pool) {
   try {
     await client.query("BEGIN");
     // Serialize resets; TRUNCATE also protects the catalog from overlapping writes.
-    await client.query("SELECT pg_advisory_xact_lock(103005)");
+    await client.query(
+      "SELECT pg_advisory_xact_lock(103005, hashtext(current_schema()))",
+    );
     await seedUsers(client);
     await seedCatalog(client);
     await client.query("COMMIT");

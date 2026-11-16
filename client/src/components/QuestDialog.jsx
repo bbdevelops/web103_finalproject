@@ -1,3 +1,5 @@
+import { releaseActionLock } from "../lib/actionLocks.js";
+import { ActionButton } from "./ActionButton.jsx";
 import { useEffect, useId, useRef } from "react";
 import { useToastHost } from "../hooks/useToast.js";
 
@@ -24,7 +26,10 @@ export function QuestDialog({
     return () => {
       element.close();
       document.body.style.overflow = previousOverflow;
-      if (trigger?.isConnected) trigger.focus();
+      if (trigger?.isConnected) {
+        releaseActionLock(trigger);
+        trigger.focus();
+      }
     };
   }, [restoreFocusTo]);
   return (
@@ -54,14 +59,14 @@ export function QuestDialog({
           <span className="eyebrow">YOUR NEXT MILESTONE</span>
           <h2 id={titleId}>{title}</h2>
         </div>
-        <button
+        <ActionButton
           className="pane-close"
           aria-label="Close pane"
           onClick={onClose}
           disabled={pending}
         >
           ×
-        </button>
+        </ActionButton>
       </header>
       {children}
     </dialog>

@@ -146,7 +146,7 @@ test("invalid and missing tree IDs return useful HTTP errors", async () => {
 
 test("empty catalog and empty trees have zero counts without dividing by zero", async () => {
   await pool.query(
-    "TRUNCATE user_quests, quests, skill_trees RESTART IDENTITY",
+    "TRUNCATE quest_images, user_quests, quests, skill_trees RESTART IDENTITY",
   );
   const { body } = await request(app).get("/api/trees").expect(200);
   assert.deepEqual(body.trees, []);

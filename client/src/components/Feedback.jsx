@@ -1,3 +1,4 @@
+import { ActionButton } from "./ActionButton.jsx";
 import { Link } from "react-router-dom";
 import { Icon } from "./Icon.jsx";
 
@@ -28,9 +29,9 @@ export function ErrorState({ error, retry }) {
           <Icon name="back" size={17} /> Back to skill trees
         </Link>
       ) : (
-        <button className="button primary" onClick={retry}>
+        <ActionButton className="button primary" onClick={retry}>
           Try again <Icon name="arrow" size={17} />
-        </button>
+        </ActionButton>
       )}
     </section>
   );

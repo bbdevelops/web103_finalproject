@@ -1,3 +1,5 @@
+import { useGuardedSubmit } from "../hooks/useGuardedSubmit.js";
+import { ActionButton } from "./ActionButton.jsx";
 import { useId, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { api } from "../lib/api.js";
@@ -6,8 +8,16 @@ import { QuestDialog } from "./QuestDialog.jsx";
 import { useToast } from "../hooks/useToast.js";
 import { progressKey, toastProgress } from "../lib/toastProgress.js";
 import { QUEST_SAVE } from "../lib/toastKeys.js";
+import { QuestCover } from "./QuestCover.jsx";
 
-function PersonalProgress({ quest, progress, onSaved, onDirty, onPending }) {
+function PersonalProgress({
+  quest,
+  progress,
+  onSaved,
+  onDirty,
+  onPending,
+  busy,
+}) {
   const fieldId = useId();
   const [form, setForm] = useState({
     status: progress?.status ?? "backlog",
@@ -37,13 +47,7 @@ function PersonalProgress({ quest, progress, onSaved, onDirty, onPending }) {
         { method: "PUT", body: JSON.stringify(form) },
       );
       onDirty(false);
-      toastProgress(
-        toast,
-        quest,
-        savedStatus,
-        saved,
-        "Progress saved",
-      );
+      toastProgress(toast, quest, savedStatus, saved, "Progress saved");
       setSavedStatus(saved.status);
       onSaved();
     } catch (failure) {
@@ -54,11 +58,15 @@ function PersonalProgress({ quest, progress, onSaved, onDirty, onPending }) {
       onPending(false);
     }
   }
+  const submit = useGuardedSubmit(save);
   return (
-    <form className="personal-progress" onSubmit={save}>
+    <form className="personal-progress" onSubmit={submit}>
       <h3>Your progress</h3>
       <p>Your notes and repository link belong to your account.</p>
-      <fieldset disabled={pending} className="quest-fields single-column">
+      <fieldset
+        disabled={pending || busy}
+        className="quest-fields single-column"
+      >
         <div className="form-field">
           <label htmlFor={`${fieldId}-status`}>Status</label>
           <select
@@ -101,9 +109,13 @@ function PersonalProgress({ quest, progress, onSaved, onDirty, onPending }) {
             </small>
           )}
         </div>
-        <button className="button primary" disabled={pending}>
+        <ActionButton
+          type="submit"
+          className="button primary"
+          disabled={pending || busy}
+        >
           {pending ? "Saving…" : "Save my progress"}
-        </button>
+        </ActionButton>
       </fieldset>
       {error && (
         <p role="alert" className="inline-error">
@@ -128,11 +140,15 @@ export function QuestDetails({
   const [saving, setSaving] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [dirty, setDirty] = useState(false);
+  const [coverDirty, setCoverDirty] = useState(false);
+  const [coverPending, setCoverPending] = useState(false);
   const close = () => {
     if (
       !deleting &&
       !saving &&
-      (!dirty || window.confirm("Discard your unsaved progress changes?"))
+      !coverPending &&
+      (!(dirty || coverDirty) ||
+        window.confirm("Discard your unsaved progress changes?"))
     )
       onClose();
   };
@@ -159,18 +175,28 @@ export function QuestDetails({
     <QuestDialog
       title={quest?.title ?? "Quest details"}
       onClose={close}
-      pending={deleting || saving}
+      pending={deleting || saving || coverPending}
       restoreFocusTo={restoreFocusTo}
     >
       <div className="pane-body">
         {!data && !error && <p role="status">Loading quest…</p>}
         {error && (
           <div role="alert" className="inline-error">
-            {error.message} <button onClick={retry}>Try again</button>
+            {error.message}{" "}
+            <ActionButton onClick={retry}>Try again</ActionButton>
           </div>
         )}
         {quest && (
           <>
+            <QuestCover
+              quest={quest}
+              image={data.image}
+              canManage={canManage}
+              busy={deleting || saving}
+              onSaved={invalidate}
+              onDirty={setCoverDirty}
+              onPending={setCoverPending}
+            />
             <div className="quest-meta">
               <span className={`difficulty difficulty-${quest.difficulty}`}>
                 {quest.difficulty}
@@ -207,6 +233,7 @@ export function QuestDetails({
             )}
             {user ? (
               <PersonalProgress
+                busy={coverPending || deleting}
                 quest={quest}
                 progress={data.progress}
                 onSaved={invalidate}
@@ -218,9 +245,9 @@ export function QuestDetails({
                 <p>
                   Sign in to save your progress, notes, and repository link.
                 </p>
-                <button className="button primary" onClick={signIn}>
+                <ActionButton className="button primary" onClick={signIn}>
                   Sign in with GitHub
-                </button>
+                </ActionButton>
               </div>
             )}
             {canManage && (
@@ -235,31 +262,32 @@ export function QuestDetails({
                   >
                     <strong>Delete “{quest.title}”?</strong>
                     <p>
-                      This removes the quest and saved progress for all users.
+                      This removes the quest, its cover, and saved progress for
+                      all users.
                     </p>
-                    <button
+                    <ActionButton
                       className="button secondary"
-                      disabled={deleting || saving}
+                      disabled={deleting || saving || coverPending}
                       onClick={() => setConfirming(false)}
                     >
                       Keep quest
-                    </button>{" "}
-                    <button
+                    </ActionButton>{" "}
+                    <ActionButton
                       className="button danger"
-                      disabled={deleting || saving}
+                      disabled={deleting || saving || coverPending}
                       onClick={remove}
                     >
                       {deleting ? "Deleting…" : "Confirm delete"}
-                    </button>
+                    </ActionButton>
                   </div>
                 ) : (
                   <>
-                    <button
+                    <ActionButton
                       className="button secondary"
-                      disabled={saving}
+                      disabled={saving || coverPending}
                       onClick={() => {
                         if (
-                          !dirty ||
+                          !(dirty || coverDirty) ||
                           window.confirm(
                             "Discard your unsaved progress changes?",
                           )
@@ -268,14 +296,14 @@ export function QuestDetails({
                       }}
                     >
                       Edit quest
-                    </button>{" "}
-                    <button
+                    </ActionButton>{" "}
+                    <ActionButton
                       className="button danger"
-                      disabled={saving}
+                      disabled={saving || coverPending}
                       onClick={() => setConfirming(true)}
                     >
                       Delete quest
-                    </button>
+                    </ActionButton>
                   </>
                 )}
                 {deleteError && (

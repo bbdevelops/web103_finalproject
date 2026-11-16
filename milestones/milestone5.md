@@ -18,7 +18,7 @@ This unit, be sure to complete all tasks listed below. To complete a task, place
 
 ## Implementation and release status
 
-The dashboard (#13), reset (#14), filtering (#19), Render deployment (#16), and final evidence (#20) are complete and verified. Toast issue #15 remains teammate-owned and is excluded from this implementation. See the [M5 progress report](progress_report_5.md) for actual issue status and evidence.
+The dashboard (#13), reset (#14), filtering (#19), Render deployment (#16), and final evidence (#20) are complete and verified. The teammate-contributed toast feature (#15) is merged and verified. Follow-up issues #25?#27 add cloud quest covers, a one-to-one relationship, wider click guards, and final evidence; their production checks remain in progress. See the [M5 progress report](progress_report_5.md) for actual issue status and evidence.
 
 ## Final Project Feature Checklist
 
@@ -96,7 +96,7 @@ Separate feature recordings: [dashboard](../docs/gifs/m5-dashboard.gif), [reset]
 
 ### 1. What went well during this unit?
 
-The existing relational schema, reusable panes, and transactional progress API allowed the final features to build on a tested foundation. The dashboard now shows private totals, tree progress, and recent completions; filters preserve full-track statistics; and admin reset preserves accounts, roles, and sessions. The local gates pass: 32 API/database tests, 20 browser checks, lint, production build, and built single-service routing smoke checks. The deployed app passed live route/API checks and real GitHub sign-in, refresh persistence, protected dashboard return, and logout. The owner-confirmed reset and final walkthrough were recorded after backing up the database.
+The existing relational schema, reusable panes, and transactional progress API allowed the final features to build on a tested foundation. The dashboard now shows private totals, tree progress, and recent completions; filters preserve full-track statistics; and admin reset preserves accounts, roles, and sessions. The local gates pass: API/database tests, 22 browser checks, and pixel comparisons against the merged toast implementation, lint, production build, and built single-service routing smoke checks. The deployed app passed live route/API checks and real GitHub sign-in, refresh persistence, protected dashboard return, and logout. The owner-confirmed reset and final walkthrough were recorded after backing up the database.
 
 ### 2. What were some challenges your group faced in this unit?
 

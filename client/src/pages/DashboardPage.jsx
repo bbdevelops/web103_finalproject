@@ -1,3 +1,4 @@
+import { ActionButton } from "../components/ActionButton.jsx";
 import { useEffect, useRef } from "react";
 import { Link, useLocation, useOutletContext } from "react-router-dom";
 import { useApiResource } from "../hooks/useApiResource.js";
@@ -20,9 +21,9 @@ function SignInPrompt({ message }) {
         {message ??
           "Your progress, notes, and completed quests are waiting here."}
       </p>
-      <button className="button primary" onClick={signIn}>
+      <ActionButton className="button primary" onClick={signIn}>
         Sign in with GitHub
-      </button>
+      </ActionButton>
     </section>
   );
 }
@@ -55,9 +56,9 @@ function DashboardContent() {
       {error && (
         <div role="alert" className="inline-error">
           {error.message}{" "}
-          <button className="text-button" onClick={retry}>
+          <ActionButton className="text-button" onClick={retry}>
             Try again
-          </button>
+          </ActionButton>
         </div>
       )}
       <section className="dashboard-stats" aria-label="Your progress summary">

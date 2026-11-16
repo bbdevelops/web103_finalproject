@@ -1,7 +1,9 @@
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { readFile, readdir, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { readFile, writeFile } from "node:fs/promises";
+import { resolve, basename } from "node:path";
 import { createHash } from "node:crypto";
 import { chromium } from "playwright";
 
@@ -10,8 +12,8 @@ const output = resolve(".artifacts/m5");
 const proof = (name) =>
   readFile(resolve(output, name), "utf8").then(JSON.parse);
 const deployed = await proof("deployment-checks.json"),
-  oauth = await proof("oauth-checks.json"),
-  backup = await proof("backups/latest.json");
+  oauth = await proof("oauth-checks.json");
+let backup = await proof("backups/latest.json");
 assert.ok(
   deployed.passed && oauth.realGitHubSignIn && oauth.origin === deployed.origin,
 );
@@ -23,42 +25,23 @@ assert.equal(
   backup.sha256,
 );
 const origin = deployed.origin;
-const files = (await readdir(resolve(output, "frames")))
-  .filter((name) => /^\d+-.*\.png$/.test(name))
-  .sort();
-const cutoff = Number(
-  files
-    .find((name) => name.endsWith("-before-global-reset.png"))
-    ?.split("-")[0],
+const session = await proof("recording-session.json");
+assert.equal(session.origin, origin);
+const frameDirectory = session.frameDirectory;
+const savedFinal = await proof("final-frames.json");
+const beforeReset = savedFinal.find((frame) =>
+  basename(frame.path).endsWith("-before-global-reset.png"),
 );
 assert.ok(
-  Number.isInteger(cutoff),
-  "The completed walkthrough frames must exist before resuming reset.",
+  beforeReset,
+  "Completed walkthrough frames must exist before resuming reset.",
 );
-const prefix = files.filter((name) => Number(name.split("-")[0]) < cutoff);
-const manifests = { dashboard: [], reset: [], filters: [], final: [] };
-const dashboardLabels = [
-  "protected-dashboard",
-  "dashboard-loading",
-  "earned-xp-and-history",
-  "dashboard-persists",
-  "recent-quest-deep-link",
-];
-const filterLabels = [
-  "full-roadmap",
-  "combined-filters",
-  "empty-filter-results",
-  "highest-xp-first",
-];
-for (const name of prefix) {
-  const label = name.replace(/^\d+-/, "").replace(/\.png$/, "");
-  const frame = {
-    path: resolve(output, "frames", name),
-    duration: label === "rejected-invalid-input" ? 2400 : 1800,
-  };
-  manifests.final.push(frame);
-  if (dashboardLabels.includes(label)) manifests.dashboard.push(frame);
-  if (filterLabels.includes(label)) manifests.filters.push(frame);
+const cutoff = Number(basename(beforeReset.path).split("-")[0]);
+const manifests = {};
+for (const group of session.groups) {
+  manifests[group] = (await proof(`${group}-frames.json`)).filter(
+    (frame) => Number(basename(frame.path).split("-")[0]) < cutoff,
+  );
 }
 const chrome = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const context = await chromium.launchPersistentContext(
@@ -85,8 +68,7 @@ try {
   assert.equal((await me.json()).user.role, "admin");
   async function frame(groups, label, duration = 2200) {
     const path = resolve(
-      output,
-      "frames",
+      frameDirectory,
       `${String(sequence++).padStart(2, "0")}-${label}.png`,
     );
     await page.screenshot({ path, animations: "disabled" });
@@ -118,6 +100,35 @@ try {
     ).status(),
     200,
   );
+  const cover = await context.request.post(
+    `${origin}/api/quests/${sampleId}/image`,
+    {
+      multipart: {
+        image: {
+          name: "project-cover.png",
+          mimeType: "image/png",
+          buffer: await readFile(resolve(output, "project-cover.png")),
+        },
+        alt_text: "Temporary cover included in the reset backup",
+      },
+    },
+  );
+  assert.equal(cover.status(), 201);
+  await promisify(execFile)(process.execPath, ["scripts/backup-database.mjs"], {
+    windowsHide: true,
+  });
+  backup = await proof("backups/latest.json");
+  assert.ok(
+    backup.mediaVerified &&
+      backup.images.some((image) => image.quest_id === sampleId),
+  );
+  for (const image of backup.images)
+    assert.equal(
+      createHash("sha256")
+        .update(await readFile(image.file))
+        .digest("hex"),
+      image.sha256,
+    );
   await page.goto(`${origin}/dashboard`);
   await page
     .getByRole("link", { name: "Reset demonstration quest", exact: true })
@@ -192,6 +203,8 @@ try {
         resumedResetRecording: true,
         backupSha256: backup.sha256,
         defaultCatalogVerified: true,
+        realCloudinaryUploads: true,
+        privateMediaBackupVerified: backup.mediaVerified,
         flows: Object.keys(manifests),
         browserErrors: errors,
         recordedAt: new Date().toISOString(),

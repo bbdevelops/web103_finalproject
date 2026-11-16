@@ -101,9 +101,15 @@ Filter a roadmap by difficulty and personal status, or sort by roadmap order, hi
 
 ![Combine difficulty and status filters, inspect empty results, clear filters, and sort by XP](docs/gifs/m5-quest-filters.gif)
 
+### 9. Quest Covers & Project Screenshots
+Creators and administrators can upload one public cover image per quest, replace it, or remove it from the details pane. Images are normalized and stored on Cloudinary; PostgreSQL enforces the one-to-one quest/image relationship. See [setup and limits](docs/quest-covers.md). Local verification is complete; deployed evidence remains in progress under #25.
+
+### 10. Duplicate-Click Guards
+Action buttons temporarily disable after activation and remain disabled through pending requests. Native validation, keyboard submission, retry, and dialog focus restoration are preserved. The existing toast controls keep their original implementation and count in coverage totals. Deployment evidence remains in progress under #26.
+
 ## Final Project Walkthrough
 
-SkillForge is deployed at [the public Render app](https://skillforge-ckbo.onrender.com/). Real GitHub sessions, CRUD, progress, dashboard links, filtering, and owner-confirmed reset were verified on the deployed application. See the [deployment runbook](docs/render-deployment.md) and [M5 progress report](milestones/progress_report_5.md). Toast work remains teammate-owned.
+SkillForge is deployed at [the public Render app](https://skillforge-ckbo.onrender.com/). Real GitHub sessions, CRUD, progress, dashboard links, filtering, and owner-confirmed reset were verified on the deployed application. See the [deployment runbook](docs/render-deployment.md) and [M5 progress report](milestones/progress_report_5.md). The teammate-contributed toast implementation is preserved. Additional rubric completion is tracked in issues #25?#27.
 
 ![Complete deployed SkillForge walkthrough](docs/gifs/m5-final-walkthrough.gif)
 
@@ -173,11 +179,14 @@ For M5 deployment, configure HTTPS, `NODE_ENV=production`, a production callback
 ### Verification
 
 ```bash
-npm test           # 32 PostgreSQL/API integration tests in disposable test schemas
+npm test           # PostgreSQL/API integration tests in disposable schemas
 npm run lint
 npm run build
 npm run test:browser
 npm run test:oauth # Opens Chrome for interactive verification with a real GitHub account
+npm run test:buttons
+npm run test:toast-visuals
+npm run test:cloudinary # Real provider check; requires private configuration
 ```
 
 The M5 browser suite starts its own API and Vite server on port 5174, uses a disposable PostgreSQL schema, and simulates only the external OAuth provider. It checks real application mutations, sessions, permissions in the UI, keyboard focus, mobile layouts, pending/error/retry behavior, loading, empty states, and missing routes. Development data is preserved. Chrome must be available; set `CHROME_PATH` for another executable, or install Playwright Chromium with `npx playwright install chromium`.

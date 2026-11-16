@@ -25,16 +25,34 @@ try {
   checks.push("database health");
   const trees = await get("/api/trees");
   assert.equal(trees.status, 200);
-  assert.ok(Array.isArray((await trees.json()).trees));
+  const catalog = (await trees.json()).trees;
+  assert.ok(Array.isArray(catalog));
   checks.push("public catalog API");
+  let bundle;
   for (const path of ["/", "/trees/1", "/dashboard", "/trees/1?quest=1"]) {
     const response = await get(path);
     assert.equal(response.status, 200, path);
     const html = await response.text();
     assert.match(html, /id="root"/);
-    assert.equal((await get(html.match(/src="([^"]+\.js)"/)[1])).status, 200);
+    const script = await get(html.match(/src="([^"]+\.js)"/)[1]);
+    assert.equal(script.status, 200);
+    if (!bundle) bundle = await script.text();
   }
   checks.push("React deep links and built assets");
+  assert.ok(
+    bundle.includes("data-click-guard") && bundle.includes("Upload cover"),
+    "The quest-cover release is not deployed yet.",
+  );
+  for (const tree of catalog) {
+    const detail = await (await get(`/api/trees/${tree.id}`)).json();
+    if (!detail.quests.length) continue;
+    const quest = await (
+      await get(`/api/quests/${detail.quests[0].id}`)
+    ).json();
+    assert.ok(Object.hasOwn(quest, "image"));
+    break;
+  }
+  checks.push("quest cover contract and guarded client assets");
   for (const path of ["/auth/me", "/api/me/progress"])
     assert.equal((await get(path)).status, 401);
   checks.push("private API rejects guest reads");

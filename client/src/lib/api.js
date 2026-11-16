@@ -3,7 +3,9 @@ export async function api(url, options = {}) {
     credentials: "include",
     ...options,
     headers: {
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(options.body && !(options.body instanceof FormData)
+        ? { "Content-Type": "application/json" }
+        : {}),
       ...options.headers,
     },
   });

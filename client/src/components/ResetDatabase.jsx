@@ -1,3 +1,4 @@
+import { ActionButton } from "./ActionButton.jsx";
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { api } from "../lib/api.js";
@@ -35,7 +36,7 @@ export function ResetDatabase() {
         <h2 id="admin-heading">A fresh start for the roadmap.</h2>
         <p>Restore the shared catalog and starter demo progress.</p>
       </div>
-      <button
+      <ActionButton
         className="button danger"
         onClick={() => {
           setError("");
@@ -43,7 +44,7 @@ export function ResetDatabase() {
         }}
       >
         Reset database
-      </button>
+      </ActionButton>
       {open && (
         <QuestDialog
           title="Reset the shared database?"
@@ -60,9 +61,9 @@ export function ResetDatabase() {
               progress.
             </p>
             <p className="reset-warning">
-              Custom quests, personal notes, repository links, and completion
-              awards will be removed. GitHub accounts, roles, and sign-in
-              sessions are preserved.
+              Custom quests, quest covers, personal notes, repository links, and
+              completion awards will be removed. GitHub accounts, roles, and
+              sign-in sessions are preserved.
             </p>
             <p>
               Make a database backup before resetting data you want to keep.
@@ -73,14 +74,14 @@ export function ResetDatabase() {
               </p>
             )}
             <footer className="pane-footer">
-              <button
+              <ActionButton
                 className="button secondary"
                 disabled={pending}
                 onClick={() => setOpen(false)}
               >
                 Cancel
-              </button>
-              <button
+              </ActionButton>
+              <ActionButton
                 className="button danger"
                 disabled={pending}
                 onClick={reset}
@@ -93,7 +94,7 @@ export function ResetDatabase() {
                 ) : (
                   "Reset to defaults"
                 )}
-              </button>
+              </ActionButton>
             </footer>
             {pending && (
               <p role="status">Restoring the catalog. Keep this window open.</p>
