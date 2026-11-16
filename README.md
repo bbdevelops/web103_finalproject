@@ -41,7 +41,7 @@ SkillForge draws inspiration from:
 
 ## Features
 
-Completed features are marked ✅. Toast notifications remain tracked separately in teammate-owned issue #15.
+Completed features are marked ✅. Toast feedback was contributed in PR #24.
 
 ### ✅ 1. Interactive Web Dev Skill Tree Explorer
 Explore specialized developer tracks (e.g., *Frontend Mastery with React*, *Backend & REST API Architecture*, *Database Modeling with PostgreSQL*, and *DevOps & Cloud Deployment*). Clicking into any tree loads dynamic routes (`/trees/:id`) that display sequential coding milestones, prerequisites, and completion progress.
@@ -101,15 +101,19 @@ Filter a roadmap by difficulty and personal status, or sort by roadmap order, hi
 
 ![Combine difficulty and status filters, inspect empty results, clear filters, and sort by XP](docs/gifs/m5-quest-filters.gif)
 
-### 9. Quest Covers & Project Screenshots
-Creators and administrators can upload one public cover image per quest, replace it, or remove it from the details pane. Images are normalized and stored on Cloudinary; PostgreSQL enforces the one-to-one quest/image relationship. See [setup and limits](docs/quest-covers.md). Local verification is complete; deployed evidence remains in progress under #25.
+### ✅ 9. Quest Covers & Project Screenshots
+Creators and administrators can upload one public cover image per quest, replace it, or remove it from the details pane. Images are normalized and stored on Cloudinary; PostgreSQL enforces the one-to-one quest/image relationship. Guests can view the saved image. See [setup and limits](docs/quest-covers.md).
 
-### 10. Duplicate-Click Guards
-Action buttons temporarily disable after activation and remain disabled through pending requests. Native validation, keyboard submission, retry, and dialog focus restoration are preserved. The existing toast controls keep their original implementation and count in coverage totals. Deployment evidence remains in progress under #26.
+![Upload a local project screenshot to Cloudinary, view it as a guest, refresh, replace it, and confirm removal](docs/gifs/m5-quest-covers.gif)
+
+### ✅ 10. Duplicate-Click Guards
+Action buttons temporarily disable after activation and remain disabled through pending requests. Native validation, keyboard submission, retry, and dialog focus restoration are preserved. The existing toast controls keep their original implementation and count in coverage totals: 33/35 declarations (94.29%) and 406/426 visible button observations (95.31%) are guarded.
+
+![Disabled form submissions, cloud-upload controls, and the filter click cooldown in the deployed application](docs/gifs/m5-click-guards.gif)
 
 ## Final Project Walkthrough
 
-SkillForge is deployed at [the public Render app](https://skillforge-ckbo.onrender.com/). Real GitHub sessions, CRUD, progress, dashboard links, filtering, and owner-confirmed reset were verified on the deployed application. See the [deployment runbook](docs/render-deployment.md) and [M5 progress report](milestones/progress_report_5.md). The teammate-contributed toast implementation is preserved. Additional rubric completion is tracked in issues #25?#27.
+SkillForge is deployed at [the public Render app](https://skillforge-ckbo.onrender.com/). Real GitHub sessions, CRUD, progress, dashboard links, filtering, cloud covers, click guards, toasts, and owner-confirmed reset were verified on the deployed application. See the [deployment runbook](docs/render-deployment.md), [M5 progress report](milestones/progress_report_5.md), and [rubric verification](docs/m5-verification.md). The teammate-contributed toast implementation and recordings are preserved.
 
 ![Complete deployed SkillForge walkthrough](docs/gifs/m5-final-walkthrough.gif)
 

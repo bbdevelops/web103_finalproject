@@ -28,7 +28,8 @@ const context = await chromium.launchPersistentContext(
   },
 );
 try {
-  const page = context.pages()[0] ?? (await context.newPage());
+  const page = await context.newPage();
+  await page.bringToFront();
   // A prior interrupted check may have left this persistent profile signed in.
   const initialLogout = await context.request.post(`${origin}/auth/logout`);
   assert.equal(
@@ -45,7 +46,7 @@ try {
   );
   await page.waitForURL(
     (url) => url.origin === origin && url.pathname === "/trees/1",
-    { timeout: 600000 },
+    { timeout: 0 },
   );
   assert.equal(new URL(page.url()).searchParams.has("authError"), false);
   await page.getByRole("button", { name: "Sign out", exact: true }).waitFor();
@@ -70,7 +71,7 @@ try {
   await page.goto(`${origin}/dashboard`);
   await page.waitForURL(
     (url) => url.origin === origin && url.pathname === "/dashboard",
-    { timeout: 600000 },
+    { timeout: 0 },
   );
   await page.getByRole("button", { name: "Sign out", exact: true }).waitFor();
   await page

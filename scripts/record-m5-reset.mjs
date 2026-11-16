@@ -60,7 +60,8 @@ let sequence = cutoff,
   resetDone = false;
 const errors = [];
 try {
-  const page = context.pages()[0] ?? (await context.newPage());
+  const page = await context.newPage();
+  await page.bringToFront();
   page.setDefaultTimeout(60000);
   page.on("pageerror", (error) => errors.push(error.message));
   const me = await context.request.get(`${origin}/auth/me`);
