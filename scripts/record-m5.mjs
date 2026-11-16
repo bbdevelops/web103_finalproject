@@ -74,13 +74,13 @@ try {
     "Provision the approved owner identity first.",
   );
   await mkdir(frameDirectory, { recursive: true });
-  async function frame(groups, label, duration = 1800) {
-    await page.evaluate(() => document.fonts.ready);
+  async function frame(groups, label, duration = 1800, capturePage = page) {
+    await capturePage.evaluate(() => document.fonts.ready);
     const path = resolve(
       frameDirectory,
       `${String(sequence++).padStart(2, "0")}-${label}.png`,
     );
-    await page.screenshot({ path, animations: "disabled" });
+    await capturePage.screenshot({ path, animations: "disabled" });
     for (const group of new Set([...groups, "final"]))
       manifests[group].push({ path, duration });
     for (const [name, frames] of Object.entries(manifests))
@@ -210,9 +210,40 @@ try {
     .getByAltText("SkillForge roadmap and portfolio quest", { exact: true })
     .waitFor();
   await page
+    .getByAltText("SkillForge roadmap and portfolio quest", { exact: true })
+    .evaluate((image) => image.decode());
+  await page
     .locator(".toast-title", { hasText: "Quest cover saved" })
     .waitFor();
   await frame(["covers"], "cloud-cover-saved");
+  const guestContext = await context
+    .browser()
+    .newContext({
+      viewport: { width: 1280, height: 900 },
+      reducedMotion: "reduce",
+    });
+  try {
+    const guestPage = await guestContext.newPage();
+    await guestPage.goto(`${origin}/trees/1`);
+    await guestPage
+      .locator(".quest-row")
+      .filter({
+        has: guestPage.getByRole("heading", { name: title, exact: true }),
+      })
+      .getByRole("button", { name: "View quest" })
+      .click();
+    await guestPage
+      .getByAltText("SkillForge roadmap and portfolio quest", { exact: true })
+      .evaluate((image) => image.decode());
+    assert.equal(
+      await guestPage.getByLabel("Image file", { exact: true }).count(),
+      0,
+    );
+    await frame(["covers"], "guest-cover-view", 2200, guestPage);
+  } finally {
+    await guestContext.close();
+  }
+  await page.bringToFront();
   await page.reload();
   await row(title).getByRole("button", { name: "View quest" }).click();
   await page
@@ -227,6 +258,9 @@ try {
   await page
     .getByAltText("Updated SkillForge project screenshot", { exact: true })
     .waitFor();
+  await page
+    .getByAltText("Updated SkillForge project screenshot", { exact: true })
+    .evaluate((image) => image.decode());
   await frame(["covers"], "cloud-cover-replaced");
   await button("Remove cover").click();
   await frame(["covers"], "remove-cover-confirmation");

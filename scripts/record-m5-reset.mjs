@@ -11,7 +11,8 @@ import { chromium } from "playwright";
 const output = resolve(".artifacts/m5");
 const proof = (name) =>
   readFile(resolve(output, name), "utf8").then(JSON.parse);
-const deployed = await proof("deployment-checks.json"), oauth = await proof("oauth-checks.json");
+const deployed = await proof("deployment-checks.json"),
+  oauth = await proof("oauth-checks.json");
 let backup = await proof("backups/latest.json");
 assert.ok(
   deployed.passed && oauth.realGitHubSignIn && oauth.origin === deployed.origin,
@@ -28,12 +29,19 @@ const session = await proof("recording-session.json");
 assert.equal(session.origin, origin);
 const frameDirectory = session.frameDirectory;
 const savedFinal = await proof("final-frames.json");
-const beforeReset = savedFinal.find(frame => basename(frame.path).endsWith("-before-global-reset.png"));
-assert.ok(beforeReset, "Completed walkthrough frames must exist before resuming reset.");
+const beforeReset = savedFinal.find((frame) =>
+  basename(frame.path).endsWith("-before-global-reset.png"),
+);
+assert.ok(
+  beforeReset,
+  "Completed walkthrough frames must exist before resuming reset.",
+);
 const cutoff = Number(basename(beforeReset.path).split("-")[0]);
 const manifests = {};
 for (const group of session.groups) {
-  manifests[group] = (await proof(`${group}-frames.json`)).filter(frame => Number(basename(frame.path).split("-")[0]) < cutoff);
+  manifests[group] = (await proof(`${group}-frames.json`)).filter(
+    (frame) => Number(basename(frame.path).split("-")[0]) < cutoff,
+  );
 }
 const chrome = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const context = await chromium.launchPersistentContext(
@@ -92,12 +100,35 @@ try {
     ).status(),
     200,
   );
-  const cover = await context.request.post(`${origin}/api/quests/${sampleId}/image`, { multipart: { image: { name: "project-cover.png", mimeType: "image/png", buffer: await readFile(resolve(output, "project-cover.png")) }, alt_text: "Temporary cover included in the reset backup" } });
+  const cover = await context.request.post(
+    `${origin}/api/quests/${sampleId}/image`,
+    {
+      multipart: {
+        image: {
+          name: "project-cover.png",
+          mimeType: "image/png",
+          buffer: await readFile(resolve(output, "project-cover.png")),
+        },
+        alt_text: "Temporary cover included in the reset backup",
+      },
+    },
+  );
   assert.equal(cover.status(), 201);
-  await promisify(execFile)(process.execPath, ["scripts/backup-database.mjs"], { windowsHide: true });
+  await promisify(execFile)(process.execPath, ["scripts/backup-database.mjs"], {
+    windowsHide: true,
+  });
   backup = await proof("backups/latest.json");
-  assert.ok(backup.mediaVerified && backup.images.some(image => image.quest_id === sampleId));
-  for (const image of backup.images) assert.equal(createHash("sha256").update(await readFile(image.file)).digest("hex"), image.sha256);
+  assert.ok(
+    backup.mediaVerified &&
+      backup.images.some((image) => image.quest_id === sampleId),
+  );
+  for (const image of backup.images)
+    assert.equal(
+      createHash("sha256")
+        .update(await readFile(image.file))
+        .digest("hex"),
+      image.sha256,
+    );
   await page.goto(`${origin}/dashboard`);
   await page
     .getByRole("link", { name: "Reset demonstration quest", exact: true })

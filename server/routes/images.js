@@ -42,7 +42,8 @@ function parseImage(req, res) {
 export function imageRoutes(pool, storage) {
   const router = Router({ mergeParams: true });
   router.post("/", async (req, res, next) => {
-    let uploaded, attemptedId,
+    let uploaded,
+      attemptedId,
       committed = false;
     req.setTimeout(30000, () => req.destroy());
     try {
@@ -110,10 +111,7 @@ export function imageRoutes(pool, storage) {
           try {
             await queueDeletion(pool, cleanupId);
           } catch {
-            console.error(
-              "Image cleanup requires a retry:",
-              cleanupId,
-            );
+            console.error("Image cleanup requires a retry:", cleanupId);
           }
         }
       }

@@ -46,7 +46,7 @@ The existing walkthrough predates quest covers and extended click guards. Their 
 
 ## Verified behavior
 
-The complete regression gates and deployed release checks are recorded when the follow-up evidence is finalized. Current verified checks include 22 isolated browser scenarios, lint, build, built routing smoke checks, and real Cloudinary upload/CDN delivery/replacement/removal with test assets cleaned up in a disposable schema.
+Current verified checks: **46 passing API/database tests**, **22 isolated browser scenarios**, lint, build, built routing smoke checks, zero production dependency audit vulnerabilities, and real Cloudinary upload/CDN delivery/replacement/removal with test assets cleaned up in a disposable schema. The final deployed release checks and new recordings remain pending.
 
 Toast source, hooks, helpers, and the shared stylesheet remain unchanged from the teammate's merged commit `6c7b64c`. Desktop, mobile, and modal toast captures are **pixel-identical** to that baseline. The existing feedback variants, icons, timing, animations and placement are preserved.
 

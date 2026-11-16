@@ -230,6 +230,12 @@ test("provider failure preserves the previous cover and returns safe retryable f
   const result = await sendImage().expect(503);
   assert.ok(!JSON.stringify(result.body).includes("private provider"));
   assert.deepEqual(await imageRow(), previous);
+  assert.equal(
+    destroyed.length,
+    1,
+    "A failed provider response still cleans the server-generated attempted ID",
+  );
+  assert.notEqual(destroyed[0], previous.public_id);
 });
 test("database failure rolls back replacement and compensates the new upload", async () => {
   await sendImage().expect(201);
