@@ -6,7 +6,7 @@ Live application: [SkillForge](https://skillforge-ckbo.onrender.com/).
 
 **Milestone 5 completion: 100% (9 closed / 9 total).** The original six issues and approved rubric follow-up issues #25-#27 are complete, with checked acceptance criteria and Done board states after release reconciliation. The teammate's toast contribution remains intact.
 
-Original M5 delivery: [PR #21](https://github.com/bbdevelops/web103_finalproject/pull/21), [PR #22](https://github.com/bbdevelops/web103_finalproject/pull/22), and [PR #23](https://github.com/bbdevelops/web103_finalproject/pull/23). Toasts: [PR #24](https://github.com/bbdevelops/web103_finalproject/pull/24). Cloud covers, one-to-one media, click guards, and preservation checks: [PR #28](https://github.com/bbdevelops/web103_finalproject/pull/28). Final evidence is delivered with this release.
+Original M5 delivery: [PR #21](https://github.com/bbdevelops/web103_finalproject/pull/21), [PR #22](https://github.com/bbdevelops/web103_finalproject/pull/22), and [PR #23](https://github.com/bbdevelops/web103_finalproject/pull/23). Toasts: [PR #24](https://github.com/bbdevelops/web103_finalproject/pull/24). Cloud covers, one-to-one media, click guards, and preservation checks: [PR #28](https://github.com/bbdevelops/web103_finalproject/pull/28). Final evidence: [PR #29](https://github.com/bbdevelops/web103_finalproject/pull/29).
 
 ## Completed issues and implementation locations
 
