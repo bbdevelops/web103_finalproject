@@ -86,9 +86,11 @@ A dedicated reset feature that restores the PostgreSQL database to its clean def
 ### ✅ 7. Action Feedback & Toast Notification System (Stretch Feature)
 Delivers immediate feedback via toast alerts when quests are created, edited, or completed, accompanied by loading spinners and dynamic button disabling during async submissions.
 - **Stretch Feature:** Polished UX states & toast alerts.
-(docs/gifs/toaster-notifications.gif)
 
-(docs/gifs/loading-toasters.gif)
+
+![Toasts confirm quest creation, edits, deletion, and status changes](docs/gifs/toaster-notifications.gif)
+
+![Saving toasts show a spinner, then turn into the result](docs/gifs/loading-toasters.gif)
 
 
 ---
