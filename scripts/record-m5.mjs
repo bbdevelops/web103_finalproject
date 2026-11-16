@@ -62,7 +62,8 @@ const frameDirectory = resolve(
   `rubric-${new Date().toISOString().replaceAll(":", "-")}`,
 );
 try {
-  const page = context.pages()[0] ?? (await context.newPage());
+  const page = await context.newPage();
+  await page.bringToFront();
   page.setDefaultTimeout(60000);
   page.setDefaultNavigationTimeout(180000);
   page.on("pageerror", (error) => errors.push(error.message));

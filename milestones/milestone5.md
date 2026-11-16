@@ -18,7 +18,7 @@ This unit, be sure to complete all tasks listed below. To complete a task, place
 
 ## Implementation and release status
 
-The dashboard (#13), reset (#14), filtering (#19), Render deployment (#16), and final evidence (#20) are complete and verified. The teammate-contributed toast feature (#15) is merged and verified. Follow-up issues #25?#27 add cloud quest covers, a one-to-one relationship, wider click guards, and final evidence; their production checks remain in progress. See the [M5 progress report](progress_report_5.md) for actual issue status and evidence.
+All nine M5 issues are complete, including the teammate-contributed toast feature (#15) and follow-up cloud covers, one-to-one relationship, click guards, and final evidence (#25-#27). Production checks and the owner-confirmed reset recording passed. See the [M5 progress report](progress_report_5.md) for actual issue status and evidence.
 
 ## Final Project Feature Checklist
 
@@ -56,7 +56,7 @@ Checked features are implemented and verified on [the deployed application](http
 Checked features are implemented and verified on [the deployed application](https://skillforge-ckbo.onrender.com/). The complete walkthrough is embedded below; source/schema/tests provide supporting architectural evidence.
 
 - [x] The project gracefully handles errors
-- [ ] The project includes a one-to-one database relationship
+- [x] The project includes a one-to-one database relationship
 - [x] The project includes a slide-out pane or modal as appropriate for your use case that pops up and covers the page content without navigating away from the current page
 - [x] The project includes a unique field within the join table
 - [x] The project includes a custom non-RESTful route with corresponding controller actions
@@ -74,13 +74,13 @@ Checked features are implemented and verified on [the deployed application](http
 - [x] Restrict available user options dynamically, such as restricting available purchases based on a user's currency
 - [x] Show a spinner while a page or page element is loading
 - [x] Disable buttons and inputs during the form submission process
-- [ ] Disable buttons after they have been clicked
+- [x] Disable buttons after they have been clicked
   - *At least 75% of buttons in your app must exhibit this behavior to receive full credit*
-- [ ] Users can upload images to the app and have them be stored on a cloud service
+- [x] Users can upload images to the app and have them be stored on a cloud service
   - *A user profile picture does **NOT** count for this rubric item **only if** the app also includes "Login via GitHub" functionality.*
   - *Adding a photo via a URL does **NOT** count for this rubric item (for example, if the user provides a URL with an image to attach it to the post).*
   - *Selecting a photo from a list of provided photos does **NOT** count for this rubric item.*
-- [ ] 🍞 [Toast messages](https://www.patternfly.org/v3/pattern-library/communication/toast-notifications/index.html) deliver simple feedback in response to user events
+- [x] 🍞 [Toast messages](https://www.patternfly.org/v3/pattern-library/communication/toast-notifications/index.html) deliver simple feedback in response to user events
 
 ## Final Demo GIF
 
@@ -88,23 +88,23 @@ Checked features are implemented and verified on [the deployed application](http
 
 ![Complete deployed SkillForge walkthrough: guest reads, GitHub sign-in, protected dashboard, invalid input, CRUD, notes, progress/XP, filtering, reset, and logout](../docs/gifs/m5-final-walkthrough.gif)
 
-The walkthrough uses real GitHub authentication and PostgreSQL-backed responses. Controlled browser network latency makes loading spinners and disabled pending controls readable; API responses are not mocked. The owner confirmed global reset after a fresh private backup.
+The walkthrough uses real GitHub authentication, PostgreSQL-backed responses, and Cloudinary file uploads. Controlled browser network latency makes loading spinners and disabled pending controls readable; API responses are not mocked. The owner confirmed global reset after a fresh private backup of both the database and referenced image bytes. Live checks verified default data, preserved admin sessions, and completed cloud cleanup.
 
-Separate feature recordings: [dashboard](../docs/gifs/m5-dashboard.gif), [reset](../docs/gifs/m5-database-reset.gif), [filtering/sorting](../docs/gifs/m5-quest-filters.gif).
+Separate feature recordings: [dashboard](../docs/gifs/m5-dashboard.gif), [reset](../docs/gifs/m5-database-reset.gif), [filtering/sorting](../docs/gifs/m5-quest-filters.gif), [cloud covers](../docs/gifs/m5-quest-covers.gif), and [click guards](../docs/gifs/m5-click-guards.gif). The teammate's [toast GIF](../docs/gifs/toaster-notifications.gif) is preserved. See [verification details](../docs/m5-verification.md) and the [archived original M5 walkthrough](../docs/gifs/archive/m5-2026-11-14/m5-final-walkthrough.gif).
 
 ## Reflection
 
 ### 1. What went well during this unit?
 
-The existing relational schema, reusable panes, and transactional progress API allowed the final features to build on a tested foundation. The dashboard now shows private totals, tree progress, and recent completions; filters preserve full-track statistics; and admin reset preserves accounts, roles, and sessions. The local gates pass: API/database tests, 22 browser checks, and pixel comparisons against the merged toast implementation, lint, production build, and built single-service routing smoke checks. The deployed app passed live route/API checks and real GitHub sign-in, refresh persistence, protected dashboard return, and logout. The owner-confirmed reset and final walkthrough were recorded after backing up the database.
+The existing schema, reusable panes, and transactional API supported the dashboard, filtering, admin reset, and cloud covers. All 46 API/database tests and 22 browser checks pass, alongside lint, build, routing checks, and real provider verification. The deployed walkthrough demonstrates actual GitHub sessions and Cloudinary uploads. The owner confirmed reset after a media-aware backup. Toast comparisons on desktop, mobile, and inside dialogs are pixel-identical to the teammate's merged implementation.
 
 ### 2. What were some challenges your group faced in this unit?
 
-Authentication required careful handling around protected routes. Browser checks exposed a logout race where the dashboard could restart GitHub sign-in before navigation returned home; remembering that the page already had an authenticated visitor fixed it. Reset needed a single transaction, rollback tests, and explicit confirmation because it affects every user. Moving from two hosted services to one shared origin also required correct asset/deep-link routing, production cookies, and preserving JSON API errors. Live verification caught an origin-comparison bug caused by a trailing slash in configuration; canonical URL normalization and a regression test fixed it without weakening foreign-origin checks.
+Authentication required handling protected-route logout races and canonical origins; browser checks and a trailing-slash regression test exposed and fixed those issues. Cloud storage introduced operations outside the database transaction, so failed saves compensate uploads and committed removals use retryable cleanup. The new foreign key required updating an older empty-catalog fixture. Backup/test contention exposed a global lock issue; scoping catalog locks to each schema fixed it. Shared button guards also had to preserve native validation, keyboard submission, focus restoration, and existing toast visuals.
 
 ### 3. What were some of the highlights or achievements that you are most proud of in this project?
 
-The project now connects a responsive React interface, an Express API, real PostgreSQL relationships, GitHub sessions, ownership checks, and consistent XP awards. The strongest achievements are the reusable accessible quest panes, completion snapshots that remain correct under concurrent saves, and a reset flow that restores defaults without removing account identities. The final dashboard and filtering controls make those capabilities easier to understand and demonstrate.
+The project connects a responsive React interface, Express API, PostgreSQL relationships, GitHub sessions, ownership checks, and consistent XP awards. Its strengths include accessible quest panes, concurrent completion snapshots, a database-enforced one-to-one cover relationship, and reset behavior that preserves identities while cleaning up remote assets. The team-contributed toast system remains visually intact, supported by source and pixel comparisons. The full deployed walkthrough provides authentic evidence of the completed features.
 
 ### 4. Reflecting on your web development journey so far, how have you grown since the beginning of the course?
 
